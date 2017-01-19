@@ -131,7 +131,7 @@ int main() {
 	/************************/
 
 	/**Rotation Matrices**/
-	float angle = 90.0;
+	float angle = pi<float>() / 2;
 	mat4 rotateX = rotate(mat4(1.0f), angle, vec3(1.0f, 0.0f, 0.0f));
 	mat4 rotateY = rotate(mat4(1.0f), angle, vec3(0.0f, 1.0f, 0.0f));
 	mat4 rotateZ = rotate(mat4(1.0f), angle, vec3(0.0f, 0.0f, 1.0f));
