@@ -101,54 +101,49 @@ bool update(float delta_time) {
   // Cursor - rotation
   // O decrease scale, P increase scale
 
-	/** Checking Time **/
+	/** Accumulating Time **/
 	total_time += delta_time;
-	s = 1.0f + sinf(total_time);
-	s *= 5.0f;
-	theta += pi<float>() * delta_time;
 	/*******************/
 
 	/** WASD Movement **/
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
 		pos += vec3(0.0f, 0.0f, -5.0f) * delta_time;
 	}
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
 		pos += vec3(0.0f, 0.0f, 5.0f) * delta_time;
 	}
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT)) {
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
 		pos += vec3(-5.0f, 0.0f, 0.0f) * delta_time;
 	}
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
 		pos += vec3(5.0f, 0.0f, 0.0f) * delta_time;
 	}
 	/*******************/
 
+	/** Cursor Rotations **/
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
+		//?
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
+		//?
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT)) {
+		theta += pi<float>() * delta_time;
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
+		theta -= pi<float>() * delta_time;
+	}
+	/**********************/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	/** Scaling **/
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
+		s = 1.0f + sinf(total_time);
+		s *= 5.0f;
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_P)) {
+		//?
+	}
+	/*************/
 
   // *********************************
   // Update the camera
@@ -163,7 +158,7 @@ bool render() {
   // *********************************
   // Create transformation matrix
   S = scale(mat4(s), vec3(s, s, s));
-  R = rotate(mat4(1.0f), theta, vec3(0.0f, 1.0f, 0.0f));
+  R = rotate(mat4(1.0f), theta, vec3(0.0f, 0.0f, 1.0f));
   T = translate(mat4(1.0f), pos);
   M = T * (R * S);
   // *********************************
