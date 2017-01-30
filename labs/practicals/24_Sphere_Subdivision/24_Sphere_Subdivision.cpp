@@ -15,23 +15,27 @@ const int subdivisions = 5;
 
 void divide_triangle(const vector<vec3> &points, int divisions, vector<vec3> &positions, vector<vec4> &colours) {
   // IF we have more divisions to do?
-  if (divisions > 0) {
-    // *********************************
-    // Calculate new vertices to work on (Normalize each element!)
-
-
-    // Divide new triangles
-
-
-
-
-    // *********************************
-  } else {
-    positions.insert(positions.end(), points.begin(), points.end());
-    for (auto i = 0; i < 3; ++i) {
-      colours.push_back(vec4(0.6f, i % 2, i % 3, 1.0f));
-    }
-  }
+	if (points.size() == 3 && divisions >= 0) {
+		if (divisions > 0) {
+			// *********************************
+			// Calculate new vertices to work on (Normalize each element!)
+			vec3 right = normalize((points[0] + points[1]));
+			vec3 left = normalize((points[0] + points[2]));
+			vec3 down = normalize((points[1] + points[2]));
+			// Divide new triangles
+			divide_triangle({ points[0], right, left }, divisions - 1, positions, colours);
+			divide_triangle({ points[2], left, down }, divisions - 1, positions, colours);
+			divide_triangle({ points[1], down, right }, divisions - 1, positions, colours);
+			divide_triangle({ right, down, left }, divisions - 1, positions, colours);
+			// *********************************
+		}
+		else {
+			positions.insert(positions.end(), points.begin(), points.end());
+			for (auto i = 0; i < 3; ++i) {
+				colours.push_back(vec4(0.6f, i % 2, i % 3, 1.0f));
+			}
+		}
+	}
 }
 
 bool load_content() {

@@ -15,7 +15,6 @@ void triangle(const vector<vec3> &points, vector<vec3> &positions, vector<vec4> 
   for (auto i = 0; i < 3; ++i){
     colours.push_back(vec4(1.0f, 0.0f, 0.0f, 1.0f));
   }
-
 }
 
 void divide_triangle(const vector<vec3> &points, unsigned int count, vector<vec3> &positions, vector<vec4> &colours) {
