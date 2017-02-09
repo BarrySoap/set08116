@@ -43,7 +43,7 @@ bool load_content() {
   // scale(3.0f, 1.0f, 3.0f), move(-10.0f, 11.5f, -30.0f), 180 rotate X axis
   meshes["disk"].get_transform().scale = vec3(3.0f, 1.0f, 3.0f);
   meshes["disk"].get_transform().position = vec3(-10.0f, 11.5f, -30.0f);
-  meshes["disk"].get_transform().rotate(vec3(180.0f, 0.0f, 0.0f));
+  meshes["disk"].get_transform().rotate(vec3(half_pi<float>(), 0.0f, 0.0f));
   // 5x scale, move(-25.0f, 2.5f, -25.0f)
   meshes["cylinder"].get_transform().scale = vec3(5.0f);
   meshes["cylinder"].get_transform().position = vec3(-25.0f, 2.5f, -25.0f);
@@ -51,7 +51,7 @@ bool load_content() {
   meshes["sphere"].get_transform().scale = vec3(2.5f);
   meshes["sphere"].get_transform().position = vec3(-25.0f, 10.0f, -25.0f);
   // 180 rotate X axis, move(-25.0f, 10.0f, -25.0f)
-  meshes["torus"].get_transform().rotate(vec3(180.0f, 0.0f, 0.0f));
+  meshes["torus"].get_transform().rotate(vec3(half_pi<float>(), 0.0f, 0.0f));
   meshes["torus"].get_transform().position = vec3(-25.0f, 10.0f, -25.0f);
   // *********************************
 
