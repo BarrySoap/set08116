@@ -72,7 +72,7 @@ bool render() {
 
   // *********************************
   // Set the dissolve_factor uniform value
-  glUniform1i(eff.get_uniform_location("dissolve_factor"), 1);
+  glUniform1f(eff.get_uniform_location("dissolve_factor"), dissolve_factor);
   // Bind the two textures - use different index for each
   renderer::bind(tex, 0);
   renderer::bind(dissolve, 1);
