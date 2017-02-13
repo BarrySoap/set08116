@@ -15,11 +15,9 @@ double cursor_y = 0.0;
 bool initialise() {
   // *********************************
   // Set input mode - hide the cursor
-	GLFWwindow *window = renderer::get_window();
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetInputMode(renderer::get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   // Capture initial mouse position
-	double *x, *y;
-	glfwGetCursorPos(window, x, y);
+	glfwGetCursorPos(renderer::get_window(), &cursor_x, &cursor_y);
   // *********************************
   return true;
 }
@@ -83,9 +81,7 @@ bool update(float delta_time) {
   double current_y;
   // *********************************
   // Get the current cursor position
-  GLFWwindow* window;
-  double *x, *y;
-  glfwGetCursorPos(window, x, y);
+  glfwGetCursorPos(renderer::get_window(), &current_x, &current_y);
   // Calculate delta of cursor positions from last frame
   double delta_x = current_x - cursor_x;
   double delta_y = current_y - cursor_y;
@@ -97,24 +93,29 @@ bool update(float delta_time) {
   // delta_x - y-axis rotation
   cam.rotate(delta_x, delta_y);
   // Use keyboard to move the camera - WSAD
+  vec3 movement;
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
-	  cam.set_position(vec3(0.0f, 0.0f, 5.0f) * delta_time);
+	  movement = vec3(0.0f, 0.0f, 5.0f);
+	  cam.set_position(movement * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
-	  cam.set_position(vec3(-5.0f, 0.0f, 0.0f) * delta_time);
+	  movement = vec3(-5.0f, 0.0f, 0.0f);
+	  cam.set_position(movement * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
-	  cam.set_position(vec3(0.0f, 0.0f, -5.0f) * delta_time);
+	  movement = vec3(0.0f, 0.0f, -5.0f);
+	  cam.set_position(movement * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
-	  cam.set_position(vec3(5.0f, 0.0f, 0.0f) * delta_time);
+	  movement = vec3(5.0f, 0.0f, 0.0f);
+	  cam.set_position(movement * delta_time);
   }
   // Move camera
-  cam.move(vec3(0.0f, 0.0f, 0.0f));
+  cam.move(movement);
   // Update the camera
   cam.update(delta_time);
   // Update cursor pos
-  glfwSetCursorPos(window, cursor_x, cursor_y);
+  glfwSetCursorPos(renderer::get_window(), cursor_x, cursor_y);
   // *********************************
   return true;
 }
