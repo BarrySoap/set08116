@@ -95,20 +95,16 @@ bool update(float delta_time) {
   // Use keyboard to move the camera - WSAD
   vec3 movement;
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
-	  movement = vec3(0.0f, 0.0f, 5.0f);
-	  cam.set_position(movement * delta_time);
+	  movement += vec3(0.0f, 0.0f, 1.0f);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
-	  movement = vec3(-5.0f, 0.0f, 0.0f);
-	  cam.set_position(movement * delta_time);
+	  movement += vec3(-1.0f, 0.0f, 0.0f);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
-	  movement = vec3(0.0f, 0.0f, -5.0f);
-	  cam.set_position(movement * delta_time);
+	  movement += vec3(0.0f, 0.0f, -1.0f);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
-	  movement = vec3(5.0f, 0.0f, 0.0f);
-	  cam.set_position(movement * delta_time);
+	  movement += vec3(1.0f, 0.0f, 0.0f);
   }
   // Move camera
   cam.move(movement);
