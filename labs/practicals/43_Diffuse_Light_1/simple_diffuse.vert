@@ -22,7 +22,7 @@ void main() {
   // Calculate position
   gl_Position = MVP * vec4(position, 1.0);
   // Calculate k
-  float k = max(((light_dir[0] * normal[0]) + (light_dir[1] * normal[1]) + (light_dir[2] + normal[2])), 0);
+  float k = max(((light_dir[0] * normal[0]) + (light_dir[1] * normal[1]) + (light_dir[2] * normal[2])), 0);
   // Calculate diffuse
   vec4 diffuse = k * (material_colour * light_colour);
   // Ensure alpha is 1
