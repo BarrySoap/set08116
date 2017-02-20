@@ -74,7 +74,7 @@ bool load_content() {
   // *********************************
 
   // Load texture
-  tex = texture("textures/checker.png");
+  tex = texture("textures/check_1.png");
 
   // *********************************
   // Set lighting values
