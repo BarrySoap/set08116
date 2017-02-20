@@ -47,9 +47,9 @@ void main() {
   // Calculate attenuation value
   float attFactor = spot.constant + (spot.linear * distance) + (spot.quadratic * distance * distance);
   // Calculate spot light intensity
-  float intensity = pow(max(dot(-1 * spot.direction, lightDirection), 0.0f), spot.power);
+  float intensity = pow(max(dot((-1 * spot.direction), lightDirection), 0.0f), spot.power);
   // Calculate light colour
-  vec4 lightColour = spot.light_colour / attFactor;
+  vec4 lightColour = spot.light_colour * (intensity / attFactor);
   // Calculate view direction
   vec3 viewDirection = normalize(eye_pos - vertex_position);
   // Now use standard phong shading but using calculated light colour and direction

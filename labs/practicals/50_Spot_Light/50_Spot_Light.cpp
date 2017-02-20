@@ -176,7 +176,7 @@ bool render() {
     // Bind material
 	renderer::bind(m.get_material(), "mat");
     // Bind light
-	renderer::bind(light, "point");
+	renderer::bind(light, "spot");
     // Bind texture
 	renderer::bind(tex, 0);
     // Set tex uniform
