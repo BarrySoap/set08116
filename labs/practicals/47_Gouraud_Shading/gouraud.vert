@@ -66,9 +66,9 @@ void main() {
   // Calculate specular
   vec4 specular = k2 * (mat.specular_reflection * light.light_colour);
   // Set primary
-  vec4 primary = mat.emissive + ambient + diffuse;
+  primary = mat.emissive + ambient + diffuse;
   // Set secondary
-  vec4 secondary = specular;
+  secondary = specular;
   // Ensure primary and secondary alphas are 1
   primary.a = 1.0f;
   secondary.a = 1.0f;
