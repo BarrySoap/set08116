@@ -102,16 +102,16 @@ bool update(float delta_time) {
   // *********************************
   // WSAD to move point light
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
-	  light.move(vec3(0.0f, 0.0f, 20.0f));
+	  light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
-	  light.move(vec3(-20.0f, 0.0f, 0.0f));
+	  light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
-	  light.move(vec3(0.0f, 0.0f, -20.0f));
+	  light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
   }
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
-	  light.move(vec3(20.0f, 0.0f, 0.0f));
+	  light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
   }
   // O and P to change range
   if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
@@ -158,7 +158,7 @@ bool render() {
     // Bind material
 	renderer::bind(m.get_material(), "mat");
     // Bind light
-	renderer::bind(light, "light");
+	renderer::bind(light, "point");
     // Bind texture
 	renderer::bind(tex, 0);
     // Set tex uniform

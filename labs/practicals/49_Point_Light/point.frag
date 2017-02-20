@@ -48,6 +48,7 @@ void main() {
   vec3 light_dir = normalize(point.position - vertex_position);
   // Now use standard phong shading but using calculated light colour and direction
   // - note no ambient
+
   float k1 = max(dot(transformed_normal, light_dir), 0.0f);
   vec4 diffuse = k1 * (mat.diffuse_reflection * lightColour);
   vec3 viewDirection = normalize(eye_pos - vertex_position);
@@ -56,7 +57,7 @@ void main() {
   vec4 specular = k2 * (mat.specular_reflection * lightColour);
   vec4 texSample = texture(tex, tex_coord);
   vec4 primary = mat.emissive + diffuse;
-  colour = primary * texSample + specular;
   colour.a = 1.0f;
+  colour = primary * texSample + specular;
   // *********************************
 }
