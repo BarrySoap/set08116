@@ -10,6 +10,7 @@ geometry geom;
 effect eff;
 texture tex;
 free_camera cam;
+material mat;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
@@ -20,14 +21,23 @@ bool initialise() {
 }
 
 bool load_content() {
-	meshes["plane"] = mesh(geometry_builder::create_plane());
+	meshes["plane"] = mesh(geometry_builder::create_plane(250, 250));
 
-	meshes["box"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+	meshes["boxA"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+	meshes["boxB"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+	meshes["boxC"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+	meshes["boxD"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
 
-	meshes["box"].get_transform().scale = vec3(5.0f);
-	meshes["box"].get_transform().position = vec3(-10.0f, 2.5f, -30.0f);
+	meshes["boxA"].get_transform().scale = vec3(5.0f);
+	meshes["boxA"].get_transform().position = vec3(122.5f, 2.5f, 122.5f);
+	meshes["boxB"].get_transform().scale = vec3(5.0f);
+	meshes["boxB"].get_transform().position = vec3(-122.5f, 2.5f, -122.5f);
+	meshes["boxC"].get_transform().scale = vec3(5.0f);
+	meshes["boxC"].get_transform().position = vec3(-122.5f, 2.5f, 122.5f);
+	meshes["boxD"].get_transform().scale = vec3(5.0f);
+	meshes["boxD"].get_transform().position = vec3(122.5f, 2.5f, -122.5f);
 
-	tex = texture("textures/check_1.png");
+	tex = texture("textures/stone.jpg");
 
   // Load in shaders
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
@@ -36,7 +46,7 @@ bool load_content() {
   eff.build();
 
   // Set camera properties
-  cam.set_position(vec3(0.0f, 0.0f, 10.0f));
+  cam.set_position(vec3(0.0f, 10.0f, 10.0f));
   cam.set_target(vec3(0.0f, 0.0f, 0.0f));
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
   cam.set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 1000.0f);
