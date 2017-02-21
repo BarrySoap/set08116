@@ -5,8 +5,10 @@ using namespace std;
 using namespace graphics_framework;
 using namespace glm;
 
+map<string, mesh> meshes;
 geometry geom;
 effect eff;
+texture tex;
 free_camera cam;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
@@ -18,25 +20,25 @@ bool initialise() {
 }
 
 bool load_content() {
-  // Create triangle data
-  vector<vec3> positions{vec3(0.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f)
+	meshes["plane"] = mesh(geometry_builder::create_plane());
 
-  };
-  // Colours
-  vector<vec4> colours{vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f)};
-  // Add to the geometry
-  geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
-  geom.add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
+	meshes["box"] = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+
+	meshes["box"].get_transform().scale = vec3(5.0f);
+	meshes["box"].get_transform().position = vec3(-10.0f, 2.5f, -30.0f);
+
+	tex = texture("textures/check_1.png");
 
   // Load in shaders
-  eff.add_shader("shaders/basic.vert", GL_VERTEX_SHADER);
-  eff.add_shader("shaders/basic.frag", GL_FRAGMENT_SHADER);
+  eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
+  eff.add_shader("shaders/simple_texture.frag", GL_FRAGMENT_SHADER);
   // Build effect
   eff.build();
 
   // Set camera properties
   cam.set_position(vec3(0.0f, 0.0f, 10.0f));
   cam.set_target(vec3(0.0f, 0.0f, 0.0f));
+  auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
   cam.set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 1000.0f);
   return true;
 }
@@ -84,18 +86,25 @@ bool update(float delta_time) {
 }
 
 bool render() {
-  // Bind effect
-  renderer::bind(eff);
-  // Create MVP matrix
-  mat4 M(1.0f);
-  auto V = cam.get_view();
-  auto P = cam.get_projection();
-  auto MVP = P * V * M;
-  // Set MVP matrix uniform
-  glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
-  // Render geometry
-  renderer::render(geom);
-  return true;
+	for (auto &e : meshes) {
+		auto m = e.second;
+		// Bind effect
+		renderer::bind(eff);
+		// Create MVP matrix
+		auto M = m.get_transform().get_transform_matrix();
+		auto V = cam.get_view();
+		auto P = cam.get_projection();
+		auto MVP = P * V * M;
+		// Set MVP matrix uniform
+		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+
+		renderer::bind(tex, 0);
+		glUniform1i(eff.get_uniform_location("tex"), 0);
+
+		// Render geometry
+		renderer::render(m);
+	}
+	return true;
 }
 
 void main() {
