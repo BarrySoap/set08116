@@ -23,16 +23,46 @@ bool initialise() {
 bool load_content() {
 	meshes["plane"] = mesh(geometry_builder::create_plane(250, 400));
 
+	// ***** Create Front Walls *****
 	meshes["FrontWallA"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
 	meshes["FrontWallB"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
 	meshes["FrontWallAB"] = mesh(geometry_builder::create_box(vec3(10.0f, 10.0f, 1.0f)));
-
+	// ***** Move and Scale *****
 	meshes["FrontWallA"].get_transform().scale = vec3(5.0f);
 	meshes["FrontWallA"].get_transform().position = vec3(75.0f, 50.0f, 197.5f);
 	meshes["FrontWallB"].get_transform().scale = vec3(5.0f);
 	meshes["FrontWallB"].get_transform().position = vec3(-75.0f, 50.0f, 197.5f);
 	meshes["FrontWallAB"].get_transform().scale = vec3(5.0f);
 	meshes["FrontWallAB"].get_transform().position = vec3(0.0f, 75.0f, 197.5f);
+	//**********************************************************************************//
+
+	// ***** Create Right Wall *****
+	meshes["RightWall"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
+	// ***** Move and Scale *****
+	meshes["RightWall"].get_transform().scale = vec3(5.0f);
+	meshes["RightWall"].get_transform().position = vec3(122.5f, 50.0f, 0.0f);
+	//**********************************************************************************//
+
+	// ***** Create Left Wall *****
+	meshes["LeftWall"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
+	// ***** Move and Scale *****
+	meshes["LeftWall"].get_transform().scale = vec3(5.0f);
+	meshes["LeftWall"].get_transform().position = vec3(-122.5f, 50.0f, 0.0f);
+	//**********************************************************************************//
+
+	// ***** Create Back Wall *****
+	meshes["BackWall"] = mesh(geometry_builder::create_box(vec3(50.0f, 20.0f, 1.0f)));
+	// ***** Move and Scale *****
+	meshes["BackWall"].get_transform().scale = vec3(5.0f);
+	meshes["BackWall"].get_transform().position = vec3(0.0f, 50.0f, -197.5f);
+	//**********************************************************************************//
+
+	// ***** Create Roof *****
+	meshes["Roof"] = mesh(geometry_builder::create_box(vec3(50.0f, 1.0f, 80.0f)));
+	// ***** Move and Scale *****
+	meshes["Roof"].get_transform().scale = vec3(5.0f);
+	meshes["Roof"].get_transform().position = vec3(0.0f, 100.0f, 0);
+	//**********************************************************************************//
 
 	tex = texture("textures/stone.jpg");
 
