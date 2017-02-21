@@ -64,7 +64,34 @@ bool load_content() {
 	meshes["Roof"].get_transform().position = vec3(0.0f, 100.0f, 0);
 	//**********************************************************************************//
 
-	tex = texture("textures/stone.jpg");
+	// ***** Create Roof Pillar *****
+	meshes["RoofPillar"] = mesh(geometry_builder::create_pyramid(vec3(50.0f, 20.0f, 80.0f)));
+	// ***** Move and Scale *****
+	meshes["RoofPillar"].get_transform().scale = vec3(5.0f);
+	meshes["RoofPillar"].get_transform().position = vec3(0.0f, 152.5f, 0);
+	//**********************************************************************************//
+
+	// ***** Create Front Pillars *****
+	meshes["FrontPillarA"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["FrontPillarB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	// ***** Move and Scale *****
+	meshes["FrontPillarA"].get_transform().scale = vec3(5.0f);
+	meshes["FrontPillarA"].get_transform().position = vec3(137.5f, 100.0f, 190.0f);
+	meshes["FrontPillarB"].get_transform().scale = vec3(5.0f);
+	meshes["FrontPillarB"].get_transform().position = vec3(-137.5f, 100.0f, 190.0f);
+	//**********************************************************************************//
+
+	// ***** Create Back Pillars *****
+	meshes["BackPillarA"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["BackPillarB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	// ***** Move and Scale *****
+	meshes["BackPillarA"].get_transform().scale = vec3(5.0f);
+	meshes["BackPillarA"].get_transform().position = vec3(137.5f, 100.0f, -190.0f);
+	meshes["BackPillarB"].get_transform().scale = vec3(5.0f);
+	meshes["BackPillarB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
+	//**********************************************************************************//
+
+	tex = texture("textures/wall.jpg");
 
   // Load in shaders
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
