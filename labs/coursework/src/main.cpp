@@ -8,7 +8,7 @@ using namespace glm;
 map<string, mesh> meshes;
 geometry geom;
 effect eff;
-texture tex;
+map<string, texture> texs;
 free_camera cam;
 material mat;
 double cursor_x = 0.0;
@@ -91,7 +91,7 @@ bool load_content() {
 	meshes["BackPillarB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
 	//**********************************************************************************//
 
-	tex = texture("textures/wall.jpg");
+	texs["FrontWall"]  = texture("textures/wall.jpg");
 
   // Load in shaders
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
@@ -162,7 +162,10 @@ bool render() {
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 
-		renderer::bind(tex, 0);
+		/*for (auto &t : texs) {
+			auto t2 = t.second;
+		}*/
+		
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 
 		// Render geometry
