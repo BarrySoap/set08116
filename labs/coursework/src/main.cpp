@@ -7,7 +7,15 @@ using namespace glm;
 
 geometry geom;
 effect eff;
-target_camera cam;
+free_camera cam;
+double cursor_x = 0.0;
+double cursor_y = 0.0;
+
+bool initialise() {
+	glfwSetInputMode(renderer::get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwGetCursorPos(renderer::get_window(), &cursor_x, &cursor_y);
+	return true;
+}
 
 bool load_content() {
   // Create triangle data
@@ -35,9 +43,44 @@ bool load_content() {
 
 
 bool update(float delta_time) {
-  // Update the camera
-  cam.update(delta_time);
-  return true;
+	static double ratio_width = quarter_pi<float>() / static_cast<float>(renderer::get_screen_width());
+	static double ratio_height =
+		(quarter_pi<float>() *
+		(static_cast<float>(renderer::get_screen_height()) / static_cast<float>(renderer::get_screen_width()))) /
+		static_cast<float>(renderer::get_screen_height());
+
+	double current_x;
+	double current_y;
+
+	glfwGetCursorPos(renderer::get_window(), &current_x, &current_y);
+
+	double delta_x = current_x - cursor_x;
+	double delta_y = current_y - cursor_y;
+
+	delta_x = delta_x * ratio_width;
+	delta_y = delta_y * ratio_height;
+	cam.rotate(delta_x, delta_y);
+
+	vec3 movement;
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
+		movement += vec3(0.0f, 0.0f, 1.0f);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
+		movement += vec3(-1.0f, 0.0f, 0.0f);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
+		movement += vec3(0.0f, 0.0f, -1.0f);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
+		movement += vec3(1.0f, 0.0f, 0.0f);
+	}
+
+	cam.move(movement);
+	cam.update(delta_time);
+
+	glfwSetCursorPos(renderer::get_window(), cursor_x, cursor_y);
+
+	return true;
 }
 
 bool render() {
