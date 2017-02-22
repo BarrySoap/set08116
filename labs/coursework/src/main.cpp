@@ -91,7 +91,11 @@ bool load_content() {
 	meshes["BackPillarB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
 	//**********************************************************************************//
 
-	texs["FrontWall"]  = texture("textures/wall.jpg");
+	texs["OutsideWalls"]  = texture("textures/OutsideWall.jpg", true, true);
+	texs["Floor"] = texture("textures/Floor.jpg", true, true);
+	texs["Roof"] = texture("textures/Roof.jpg", true, true);
+	texs["Pillars"] = texture("textures/wall.jpg", true, true);
+
 
   // Load in shaders
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
@@ -150,6 +154,10 @@ bool update(float delta_time) {
 }
 
 bool render() {
+	renderer::bind(texs["OutsideWalls"], 0);
+	renderer::bind(texs["Floor"], 1);
+	renderer::bind(texs["Roof"], 2);
+
 	for (auto &e : meshes) {
 		auto m = e.second;
 		// Bind effect
@@ -162,10 +170,6 @@ bool render() {
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 
-		/*for (auto &t : texs) {
-			auto t2 = t.second;
-		}*/
-		
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 
 		// Render geometry
