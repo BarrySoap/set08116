@@ -11,6 +11,7 @@ effect eff;
 map<string, texture> texs;
 free_camera cam;
 material mat;
+spot_light light;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
@@ -91,11 +92,22 @@ bool load_content() {
 	meshes["BackPillarB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
 	//**********************************************************************************//
 
+	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	mat.set_shininess(25.0f);
+	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	meshes["FrontWallA"].set_material(mat);
+
 	texs["OutsideWalls"]  = texture("textures/OutsideWall.jpg", true, true);
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
 	texs["Roof"] = texture("textures/Roof.jpg", true, true);
-	texs["Pillars"] = texture("textures/wall.jpg", true, true);
+	texs["Pillars"] = texture("textures/OutsideWall.jpg", true, true);
 
+	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
+	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	light.set_direction(vec3(0.0f, 0.0f, -1.0f));
+	light.set_range(20.0f);
+	light.set_power(1.0f);
 
   // Load in shaders
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
@@ -113,6 +125,29 @@ bool load_content() {
 
 
 bool update(float delta_time) {
+	static float range = 20.0f;
+
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
+		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT)) {
+		light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
+		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
+		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
+		range += 5.0f;
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_P)) {
+		range -= 5.0f;
+	}
+
+	light.set_range(range);
+
 	static double ratio_width = quarter_pi<float>() / static_cast<float>(renderer::get_screen_width());
 	static double ratio_height =
 		(quarter_pi<float>() *
@@ -154,10 +189,6 @@ bool update(float delta_time) {
 }
 
 bool render() {
-	renderer::bind(texs["OutsideWalls"], 0);
-	renderer::bind(texs["Floor"], 1);
-	renderer::bind(texs["Roof"], 2);
-
 	for (auto &e : meshes) {
 		auto m = e.second;
 		// Bind effect
@@ -169,8 +200,15 @@ bool render() {
 		auto MVP = P * V * M;
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
-
+		glUniformMatrix4fv(eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(M));
+		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
+		renderer::bind(m.get_material(), "mat");
+		renderer::bind(light, "spot");
+		renderer::bind(texs["OutsideWalls"], 0);
+		renderer::bind(texs["Floor"], 1);
+		renderer::bind(texs["Roof"], 2);
 		glUniform1i(eff.get_uniform_location("tex"), 0);
+		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
 
 		// Render geometry
 		renderer::render(m);
