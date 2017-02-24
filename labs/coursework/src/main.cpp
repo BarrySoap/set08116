@@ -97,10 +97,10 @@ bool load_content() {
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
-	texs["Wall"]  = texture("textures/OutsideWall.jpg", true, true);
+	texs["Wall"]  = texture("textures/InsideWall.jpg", true, true);
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
 	texs["Roof"] = texture("textures/Roof.jpg", true, true);
-	texs["Pillar"] = texture("textures/OutsideWall.jpg", true, true);
+	texs["Pillar"] = texture("textures/Pillar.jpg", true, true);
 
 	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -133,7 +133,7 @@ bool update(float delta_time) {
 		light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
-		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
+		light.move(vec3(0.0f, 0.0f, 60.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
 		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
@@ -199,6 +199,21 @@ bool update(float delta_time) {
 	return true;
 }
 
+texture testytest(string name) {
+	if (name.substr(0, 6).compare("Pillar") == 0) {
+		return texs["Pillar"];
+	}
+	else if (name.substr(0, 4).compare("Wall") == 0) {
+		return texs["Wall"];
+	}
+	else if (name.substr(0, 4).compare("Roof") == 0) {
+		return texs["Roof"];
+	}
+	else {
+		return texs[name];
+	}
+}
+
 bool render() {
 	for (auto &e : meshes) {
 		auto m = e.second;
@@ -216,19 +231,7 @@ bool render() {
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(light, "spot");
 
-		if (e.first.substr(0, 6).compare("Pillar") == 0) {
-			renderer::bind(texs["Pillar"], 0);
-		}
-		else if (e.first.substr(0, 4).compare("Wall") == 0) {
-			renderer::bind(texs["Wall"], 1);
-		}
-		else if (e.first.substr(0, 4).compare("Roof") == 0) {
-			renderer::bind(texs["Roof"], 2);
-		}
-		else {
-			cout << e.first << endl;
-			renderer::bind(texs[e.first], 0);
-		}
+		renderer::bind(testytest(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
