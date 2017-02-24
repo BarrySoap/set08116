@@ -105,7 +105,7 @@ bool load_content() {
 
 	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	light.set_direction(vec3(0.0f, 0.0f, -1.0f));
+	light.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
 	light.set_range(20.0f);
 	light.set_power(1.0f);
 
@@ -125,16 +125,16 @@ bool load_content() {
 
 
 bool update(float delta_time) {
-	static float range = 20.0f;
+	static float range = 70.0f;
 
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
-		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
+		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT)) {
 		light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
-		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
+		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
 		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
@@ -163,8 +163,8 @@ bool update(float delta_time) {
 	double delta_y = current_y - cursor_y;
 
 	delta_x = delta_x * ratio_width;
-	delta_y = delta_y * ratio_height;
-	cam.rotate(delta_x, delta_y);
+	delta_y = delta_y * ratio_height; 
+	cam.rotate(delta_x, -delta_y);
 
 	vec3 movement;
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
@@ -204,7 +204,7 @@ bool render() {
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(light, "spot");
-		renderer::bind(texs["OutsideWalls"], 0);
+		renderer::bind(texs["OutsideWalls"], 0); 
 		renderer::bind(texs["Floor"], 1);
 		renderer::bind(texs["Roof"], 2);
 		glUniform1i(eff.get_uniform_location("tex"), 0);
@@ -221,6 +221,7 @@ void main() {
   app application("Graphics Coursework");
   // Set load content, update and render methods
   application.set_load_content(load_content);
+  application.set_initialise(initialise);
   application.set_update(update);
   application.set_render(render);
   // Run application
