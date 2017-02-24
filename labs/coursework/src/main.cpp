@@ -25,37 +25,37 @@ bool load_content() {
 	meshes["plane"] = mesh(geometry_builder::create_plane(250, 400));
 
 	// ***** Create Front Walls *****
-	meshes["FrontWallA"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
-	meshes["FrontWallB"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
-	meshes["FrontWallAB"] = mesh(geometry_builder::create_box(vec3(10.0f, 10.0f, 1.0f)));
+	meshes["WallFrontA"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
+	meshes["WallFrontB"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
+	meshes["WallFrontAB"] = mesh(geometry_builder::create_box(vec3(10.0f, 10.0f, 1.0f)));
 	// ***** Move and Scale *****
-	meshes["FrontWallA"].get_transform().scale = vec3(5.0f);
-	meshes["FrontWallA"].get_transform().position = vec3(75.0f, 50.0f, 197.5f);
-	meshes["FrontWallB"].get_transform().scale = vec3(5.0f);
-	meshes["FrontWallB"].get_transform().position = vec3(-75.0f, 50.0f, 197.5f);
-	meshes["FrontWallAB"].get_transform().scale = vec3(5.0f);
-	meshes["FrontWallAB"].get_transform().position = vec3(0.0f, 75.0f, 197.5f);
+	meshes["WallFrontA"].get_transform().scale = vec3(5.0f);
+	meshes["WallFrontA"].get_transform().position = vec3(75.0f, 50.0f, 197.5f);
+	meshes["WallFrontB"].get_transform().scale = vec3(5.0f);
+	meshes["WallFrontB"].get_transform().position = vec3(-75.0f, 50.0f, 197.5f);
+	meshes["WallFrontAB"].get_transform().scale = vec3(5.0f);
+	meshes["WallFrontAB"].get_transform().position = vec3(0.0f, 75.0f, 197.5f);
 	//**********************************************************************************//
 
 	// ***** Create Right Wall *****
-	meshes["RightWall"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
+	meshes["WallRight"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
 	// ***** Move and Scale *****
-	meshes["RightWall"].get_transform().scale = vec3(5.0f);
-	meshes["RightWall"].get_transform().position = vec3(122.5f, 50.0f, 0.0f);
+	meshes["WallRight"].get_transform().scale = vec3(5.0f);
+	meshes["WallRight"].get_transform().position = vec3(122.5f, 50.0f, 0.0f);
 	//**********************************************************************************//
 
 	// ***** Create Left Wall *****
-	meshes["LeftWall"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
+	meshes["WallLeft"] = mesh(geometry_builder::create_box(vec3(1.0f, 20.0f, 80.0f)));
 	// ***** Move and Scale *****
-	meshes["LeftWall"].get_transform().scale = vec3(5.0f);
-	meshes["LeftWall"].get_transform().position = vec3(-122.5f, 50.0f, 0.0f);
+	meshes["WallLeft"].get_transform().scale = vec3(5.0f);
+	meshes["WallLeft"].get_transform().position = vec3(-122.5f, 50.0f, 0.0f);
 	//**********************************************************************************//
 
 	// ***** Create Back Wall *****
-	meshes["BackWall"] = mesh(geometry_builder::create_box(vec3(50.0f, 20.0f, 1.0f)));
+	meshes["WallBack"] = mesh(geometry_builder::create_box(vec3(50.0f, 20.0f, 1.0f)));
 	// ***** Move and Scale *****
-	meshes["BackWall"].get_transform().scale = vec3(5.0f);
-	meshes["BackWall"].get_transform().position = vec3(0.0f, 50.0f, -197.5f);
+	meshes["WallBack"].get_transform().scale = vec3(5.0f);
+	meshes["WallBack"].get_transform().position = vec3(0.0f, 50.0f, -197.5f);
 	//**********************************************************************************//
 
 	// ***** Create Roof *****
@@ -73,23 +73,23 @@ bool load_content() {
 	//**********************************************************************************//
 
 	// ***** Create Front Pillars *****
-	meshes["FrontPillarA"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
-	meshes["FrontPillarB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarFront"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarFrontB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
 	// ***** Move and Scale *****
-	meshes["FrontPillarA"].get_transform().scale = vec3(5.0f);
-	meshes["FrontPillarA"].get_transform().position = vec3(137.5f, 100.0f, 190.0f);
-	meshes["FrontPillarB"].get_transform().scale = vec3(5.0f);
-	meshes["FrontPillarB"].get_transform().position = vec3(-137.5f, 100.0f, 190.0f);
+	meshes["PillarFront"].get_transform().scale = vec3(5.0f);
+	meshes["PillarFront"].get_transform().position = vec3(137.5f, 100.0f, 190.0f);
+	meshes["PillarFrontB"].get_transform().scale = vec3(5.0f);
+	meshes["PillarFrontB"].get_transform().position = vec3(-137.5f, 100.0f, 190.0f);
 	//**********************************************************************************//
 
 	// ***** Create Back Pillars *****
-	meshes["BackPillarA"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
-	meshes["BackPillarB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarBack"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarBackB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
 	// ***** Move and Scale *****
-	meshes["BackPillarA"].get_transform().scale = vec3(5.0f);
-	meshes["BackPillarA"].get_transform().position = vec3(137.5f, 100.0f, -190.0f);
-	meshes["BackPillarB"].get_transform().scale = vec3(5.0f);
-	meshes["BackPillarB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
+	meshes["PillarBack"].get_transform().scale = vec3(5.0f);
+	meshes["PillarBack"].get_transform().position = vec3(137.5f, 100.0f, -190.0f);
+	meshes["PillarBackB"].get_transform().scale = vec3(5.0f);
+	meshes["PillarBackB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
 	//**********************************************************************************//
 
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -97,11 +97,13 @@ bool load_content() {
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
 	meshes["FrontWallA"].set_material(mat);
+	meshes["FrontWallB"].set_material(mat);
+	meshes["FrontWallAB"].set_material(mat);
 
-	texs["OutsideWalls"]  = texture("textures/OutsideWall.jpg", true, true);
+	texs["Wall"]  = texture("textures/OutsideWall.jpg", true, true);
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
 	texs["Roof"] = texture("textures/Roof.jpg", true, true);
-	texs["Pillars"] = texture("textures/OutsideWall.jpg", true, true);
+	texs["Pillar"] = texture("textures/OutsideWall.jpg", true, true);
 
 	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -140,10 +142,22 @@ bool update(float delta_time) {
 		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
-		range += 5.0f;
+		range *= 1 + 0.5f * delta_time;
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_P)) {
-		range -= 5.0f;
+		range *= 1 - 0.5f * delta_time;
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_I)) {
+		light.rotate(vec3(0.3f, 0.0f, 0.0f));
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_K)) {
+		light.rotate(vec3(-0.3f, 0.0f, 0.0f));
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_J)) {
+		light.rotate(vec3(0.0f, 0.3f, 0.0f));
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_L)) {
+		light.rotate(vec3(0.0f, -0.3f, 0.0f));
 	}
 
 	light.set_range(range);
@@ -204,9 +218,21 @@ bool render() {
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(light, "spot");
-		renderer::bind(texs["OutsideWalls"], 0); 
-		renderer::bind(texs["Floor"], 1);
-		renderer::bind(texs["Roof"], 2);
+
+		if (e.first.substr(0, 6).compare("Pillar") == 0) {
+			renderer::bind(texs["Pillar"], 0);
+		}
+		else {
+			renderer::bind(texs[e.first], 0);
+		}
+		if (e.first.substr(0, 6).compare("Wall") == 0) {
+			renderer::bind(texs["Wall"], 0);
+		}
+		else {
+			renderer::bind(texs[e.first], 0);
+		}
+
+		renderer::bind(texs[e.first], 0);
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
 
