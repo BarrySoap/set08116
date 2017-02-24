@@ -22,7 +22,7 @@ bool initialise() {
 }
 
 bool load_content() {
-	meshes["plane"] = mesh(geometry_builder::create_plane(250, 400));
+	meshes["Floor"] = mesh(geometry_builder::create_plane(250, 400));
 
 	// ***** Create Front Walls *****
 	meshes["WallFrontA"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
@@ -59,17 +59,17 @@ bool load_content() {
 	//**********************************************************************************//
 
 	// ***** Create Roof *****
-	meshes["Roof"] = mesh(geometry_builder::create_box(vec3(50.0f, 1.0f, 80.0f)));
+	meshes["WallTop"] = mesh(geometry_builder::create_box(vec3(50.0f, 1.0f, 80.0f)));
 	// ***** Move and Scale *****
-	meshes["Roof"].get_transform().scale = vec3(5.0f);
-	meshes["Roof"].get_transform().position = vec3(0.0f, 100.0f, 0);
+	meshes["WallTop"].get_transform().scale = vec3(5.0f);
+	meshes["WallTop"].get_transform().position = vec3(0.0f, 100.0f, 0);
 	//**********************************************************************************//
 
 	// ***** Create Roof Pillar *****
-	meshes["RoofPillar"] = mesh(geometry_builder::create_pyramid(vec3(50.0f, 20.0f, 80.0f)));
+	meshes["Roof"] = mesh(geometry_builder::create_pyramid(vec3(50.0f, 20.0f, 80.0f)));
 	// ***** Move and Scale *****
-	meshes["RoofPillar"].get_transform().scale = vec3(5.0f);
-	meshes["RoofPillar"].get_transform().position = vec3(0.0f, 152.5f, 0);
+	meshes["Roof"].get_transform().scale = vec3(5.0f);
+	meshes["Roof"].get_transform().position = vec3(0.0f, 152.5f, 0);
 	//**********************************************************************************//
 
 	// ***** Create Front Pillars *****
@@ -96,9 +96,6 @@ bool load_content() {
 	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	meshes["FrontWallA"].set_material(mat);
-	meshes["FrontWallB"].set_material(mat);
-	meshes["FrontWallAB"].set_material(mat);
 
 	texs["Wall"]  = texture("textures/OutsideWall.jpg", true, true);
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
@@ -222,17 +219,17 @@ bool render() {
 		if (e.first.substr(0, 6).compare("Pillar") == 0) {
 			renderer::bind(texs["Pillar"], 0);
 		}
-		else {
-			renderer::bind(texs[e.first], 0);
+		else if (e.first.substr(0, 4).compare("Wall") == 0) {
+			renderer::bind(texs["Wall"], 1);
 		}
-		if (e.first.substr(0, 6).compare("Wall") == 0) {
-			renderer::bind(texs["Wall"], 0);
+		else if (e.first.substr(0, 4).compare("Roof") == 0) {
+			renderer::bind(texs["Roof"], 2);
 		}
 		else {
+			cout << e.first << endl;
 			renderer::bind(texs[e.first], 0);
 		}
 
-		renderer::bind(texs[e.first], 0);
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
 
