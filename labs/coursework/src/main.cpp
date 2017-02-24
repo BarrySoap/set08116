@@ -22,7 +22,13 @@ bool initialise() {
 }
 
 bool load_content() {
+	// ***** Create Plane/Flooring *****
 	meshes["Floor"] = mesh(geometry_builder::create_plane(250, 400));
+	meshes["FloorB"] = mesh(geometry_builder::create_box(vec3(50.0f, 2.0f, 10.0f)));
+
+	meshes["FloorB"].get_transform().scale = vec3(5.0f);
+	meshes["FloorB"].get_transform().position = vec3(0.0f, 5.0f, -170.0f);
+	//**********************************************************************************/
 
 	// ***** Create Front Walls *****
 	meshes["WallFrontA"] = mesh(geometry_builder::create_box(vec3(20.0f, 20.0f, 1.0f)));
@@ -92,6 +98,54 @@ bool load_content() {
 	meshes["PillarBackB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
 	//**********************************************************************************//
 
+	// ***** Create Stands *****
+	meshes["Stand"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
+	meshes["StandB"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
+	meshes["StandC"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
+	meshes["StandD"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
+	// ***** Move and Scale *****
+	meshes["Stand"].get_transform().scale = vec3(5.0f);
+	meshes["Stand"].get_transform().position = vec3(70.0f, 13.0f, 80.0f);
+	meshes["StandB"].get_transform().scale = vec3(5.0f);
+	meshes["StandB"].get_transform().position = vec3(-70.0f, 13.0f, 80.0f);
+	meshes["StandC"].get_transform().scale = vec3(5.0f);
+	meshes["StandC"].get_transform().position = vec3(70.0f, 13.0f, -80.0f);
+	meshes["StandD"].get_transform().scale = vec3(5.0f);
+	meshes["StandD"].get_transform().position = vec3(-70.0f, 13.0f, -80.0f);
+	//*************************************************************************//
+
+	// ***** Create Torus' *****
+	meshes["Torus"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusB"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusC"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusD"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	// ***** Move and Scale *****
+	meshes["Torus"].get_transform().scale = vec3(5.0f);
+	meshes["Torus"].get_transform().position = vec3(70.0f, 20.0f, 80.0f);
+	meshes["TorusB"].get_transform().scale = vec3(5.0f);
+	meshes["TorusB"].get_transform().position = vec3(-70.0f, 20.0f, 80.0f);
+	meshes["TorusC"].get_transform().scale = vec3(5.0f);
+	meshes["TorusC"].get_transform().position = vec3(70.0f, 20.0f, -80.0f);
+	meshes["TorusD"].get_transform().scale = vec3(5.0f);
+	meshes["TorusD"].get_transform().position = vec3(-70.0f, 20.0f, -80.0f);
+	//************************************************************************//
+
+	// ***** Create Spheres *****
+	meshes["Sphere"] = mesh(geometry_builder::create_sphere(20, 20));
+	meshes["SphereB"] = mesh(geometry_builder::create_sphere(20, 20));
+	meshes["SphereC"] = mesh(geometry_builder::create_sphere(20, 20));
+	meshes["SphereD"] = mesh(geometry_builder::create_sphere(20, 20));
+	// ***** Move and Scale *****
+	meshes["Sphere"].get_transform().scale = vec3(5.0f);
+	meshes["Sphere"].get_transform().position = vec3(70.0f, 30.0f, 80.0f);
+	meshes["SphereB"].get_transform().scale = vec3(5.0f);
+	meshes["SphereB"].get_transform().position = vec3(-70.0f, 30.0f, 80.0f);
+	meshes["SphereC"].get_transform().scale = vec3(5.0f);
+	meshes["SphereC"].get_transform().position = vec3(70.0f, 30.0f, -80.0f);
+	meshes["SphereD"].get_transform().scale = vec3(5.0f);
+	meshes["SphereD"].get_transform().position = vec3(-70.0f, 30.0f, -80.0f);
+	//************************************************************************//
+
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	mat.set_shininess(25.0f);
@@ -101,6 +155,9 @@ bool load_content() {
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
 	texs["Roof"] = texture("textures/Roof.jpg", true, true);
 	texs["Pillar"] = texture("textures/Pillar.jpg", true, true);
+	texs["Stand"] = texture("textures/Pillar.jpg", true, true);
+	texs["Torus"] = texture("textures/Torus.jpg", true, true);
+	texs["Sphere"] = texture("textures/Sphere.jpg", true, true);
 
 	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -126,6 +183,17 @@ bool load_content() {
 bool update(float delta_time) {
 	static float range = 70.0f;
 
+	// ***** Rotate the torus' and spheres along the y axis *****
+	meshes["Torus"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusB"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusC"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["Sphere"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["SphereB"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["SphereC"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["SphereD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	//**************************************************************************************//
+
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
 		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
 	}
@@ -133,7 +201,7 @@ bool update(float delta_time) {
 		light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
-		light.move(vec3(0.0f, 0.0f, 60.0f) * delta_time);
+		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
 		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
@@ -179,16 +247,16 @@ bool update(float delta_time) {
 
 	vec3 movement;
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
-		movement += vec3(0.0f, 0.0f, 1.0f);
+		movement += vec3(0.0f, 0.0f, 5.0f);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_A)) {
-		movement += vec3(-1.0f, 0.0f, 0.0f);
+		movement += vec3(-5.0f, 0.0f, 0.0f);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_S)) {
-		movement += vec3(0.0f, 0.0f, -1.0f);
+		movement += vec3(0.0f, 0.0f, -5.0f);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
-		movement += vec3(1.0f, 0.0f, 0.0f);
+		movement += vec3(5.0f, 0.0f, 0.0f);
 	}
 
 	cam.move(movement);
@@ -199,7 +267,7 @@ bool update(float delta_time) {
 	return true;
 }
 
-texture testytest(string name) {
+texture BindingHelper(string name) {
 	if (name.substr(0, 6).compare("Pillar") == 0) {
 		return texs["Pillar"];
 	}
@@ -208,6 +276,18 @@ texture testytest(string name) {
 	}
 	else if (name.substr(0, 4).compare("Roof") == 0) {
 		return texs["Roof"];
+	}
+	else if (name.substr(0, 5).compare("Floor") == 0) {
+		return texs["Floor"];
+	}
+	else if (name.substr(0, 5).compare("Stand") == 0) {
+		return texs["Stand"];
+	}
+	else if (name.substr(0, 5).compare("Torus") == 0) {
+		return texs["Torus"];
+	}
+	else if (name.substr(0, 6).compare("Sphere") == 0) {
+		return texs["Sphere"];
 	}
 	else {
 		return texs[name];
@@ -231,7 +311,7 @@ bool render() {
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(light, "spot");
 
-		renderer::bind(testytest(e.first), 0);
+		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
