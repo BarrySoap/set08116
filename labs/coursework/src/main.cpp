@@ -9,13 +9,17 @@ map<string, mesh> meshes;
 geometry geom;
 effect eff;
 map<string, texture> texs;
-free_camera cam;
+array<camera*, 2> cameras;
+uint cameraType = 1;
+uint targetCam = 1;
 material mat;
 spot_light light;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
 bool initialise() {
+	cameras[0] = new target_camera();
+	cameras[1] = new free_camera();
 	glfwSetInputMode(renderer::get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwGetCursorPos(renderer::get_window(), &cursor_x, &cursor_y);
 	return true;
@@ -172,10 +176,10 @@ bool load_content() {
   eff.build();
 
   // Set camera properties
-  cam.set_position(vec3(0.0f, 10.0f, 400.0f));
-  cam.set_target(vec3(0.0f, 0.0f, 0.0f));
+  cameras[1]->set_position(vec3(0.0f, 10.0f, 400.0f));
+  cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
+  cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 1000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
-  cam.set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 1000.0f);
   return true;
 }
 
@@ -225,6 +229,54 @@ bool update(float delta_time) {
 		light.rotate(vec3(0.0f, -0.3f, 0.0f));
 	}
 
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
+	{
+		cameraType = 1;
+	}
+
+	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_1))
+	{
+		cameraType = 0;
+		targetCam = 1;
+	}
+	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_2))
+	{
+		cameraType = 0;
+		targetCam = 2;
+	}
+	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_3))
+	{
+		cameraType = 0;
+		targetCam = 3;
+	}
+	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_4))
+	{
+		cameraType = 0;
+		targetCam = 4;
+	}
+
+	if (cameraType == 0)
+	{
+		if (targetCam == 1) {
+			cameras[0]->set_position(vec3(250.0f, 400.0f, -200.0f));
+			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
+		}
+		else if (targetCam == 2) {
+			cameras[0]->set_position(vec3(-250.0f, 400.0f, -200.0f));
+			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
+		}
+		else if (targetCam == 3) {
+			cameras[0]->set_position(vec3(250.0f, 400.0f, 200.0f));
+			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
+		}
+		else if (targetCam == 4) {
+			cameras[0]->set_position(vec3(-250.0f, 400.0f, 200.0f));
+			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
+		}
+		cameras[0]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 2.414f, 1000.0f);
+		cameras[0]->update(delta_time);
+	}
+
 	light.set_range(range);
 
 	static double ratio_width = quarter_pi<float>() / static_cast<float>(renderer::get_screen_width());
@@ -243,7 +295,7 @@ bool update(float delta_time) {
 
 	delta_x = delta_x * ratio_width;
 	delta_y = delta_y * ratio_height; 
-	cam.rotate(delta_x, -delta_y);
+	static_cast<free_camera*>(cameras[1])->rotate(delta_x, -delta_y);
 
 	vec3 movement;
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
@@ -259,8 +311,8 @@ bool update(float delta_time) {
 		movement += vec3(5.0f, 0.0f, 0.0f);
 	}
 
-	cam.move(movement);
-	cam.update(delta_time);
+	static_cast<free_camera*>(cameras[1])->move(movement);
+	static_cast<free_camera*>(cameras[1])->update(delta_time);
 
 	glfwSetCursorPos(renderer::get_window(), cursor_x, cursor_y);
 
@@ -301,8 +353,8 @@ bool render() {
 		renderer::bind(eff);
 		// Create MVP matrix
 		auto M = m.get_transform().get_transform_matrix();
-		auto V = cam.get_view();
-		auto P = cam.get_projection();
+		auto V = cameras[cameraType]->get_view();
+		auto P = cameras[cameraType]->get_projection();
 		auto MVP = P * V * M;
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
@@ -310,11 +362,10 @@ bool render() {
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(light, "spot");
-
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
-		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
+		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
 		// Render geometry
 		renderer::render(m);
