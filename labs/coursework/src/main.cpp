@@ -229,27 +229,28 @@ bool update(float delta_time) {
 		light.rotate(vec3(0.0f, -0.3f, 0.0f));
 	}
 
+	light.set_range(range);
+
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
 	{
 		cameraType = 1;
 	}
-
-	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_1))
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_1))
 	{
 		cameraType = 0;
 		targetCam = 1;
 	}
-	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_2))
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_2))
 	{
 		cameraType = 0;
 		targetCam = 2;
 	}
-	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_3))
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_3))
 	{
 		cameraType = 0;
 		targetCam = 3;
 	}
-	else if (glfwGetKey(renderer::get_window(), GLFW_KEY_4))
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_4))
 	{
 		cameraType = 0;
 		targetCam = 4;
@@ -257,27 +258,27 @@ bool update(float delta_time) {
 
 	if (cameraType == 0)
 	{
-		if (targetCam == 1) {
+		switch (targetCam) {
+		case 1:
 			cameras[0]->set_position(vec3(250.0f, 400.0f, -200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
-		}
-		else if (targetCam == 2) {
+			break;
+		case 2:
 			cameras[0]->set_position(vec3(-250.0f, 400.0f, -200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
-		}
-		else if (targetCam == 3) {
+			break;
+		case 3:
 			cameras[0]->set_position(vec3(250.0f, 400.0f, 200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
-		}
-		else if (targetCam == 4) {
+			break;
+		case 4:
 			cameras[0]->set_position(vec3(-250.0f, 400.0f, 200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
+			break;
 		}
 		cameras[0]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 2.414f, 1000.0f);
 		cameras[0]->update(delta_time);
 	}
-
-	light.set_range(range);
 
 	static double ratio_width = quarter_pi<float>() / static_cast<float>(renderer::get_screen_width());
 	static double ratio_height =
