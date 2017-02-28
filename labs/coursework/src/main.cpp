@@ -18,10 +18,16 @@ double cursor_x = 0.0;
 double cursor_y = 0.0;
 
 bool initialise() {
+	// ***** Set up Free/Target Cameras *****
 	cameras[0] = new target_camera();
 	cameras[1] = new free_camera();
+	/***************************************/
+
+	// ***** Hide the cursor from the screen *****
 	glfwSetInputMode(renderer::get_window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwGetCursorPos(renderer::get_window(), &cursor_x, &cursor_y);
+	/**************************************************************************/
+
 	return true;
 }
 
@@ -150,11 +156,14 @@ bool load_content() {
 	meshes["SphereD"].get_transform().position = vec3(-70.0f, 30.0f, -80.0f);
 	//************************************************************************//
 
+	// ***** Set Material Attributes *****
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	/*********************************************/
 
+	// ***** Initialise Textures *****
 	texs["Wall"]  = texture("textures/InsideWall.jpg", true, true);
 	texs["Floor"] = texture("textures/Floor.jpg", true, true);
 	texs["Roof"] = texture("textures/Roof.jpg", true, true);
@@ -162,24 +171,30 @@ bool load_content() {
 	texs["Stand"] = texture("textures/Pillar.jpg", true, true);
 	texs["Torus"] = texture("textures/Torus.jpg", true, true);
 	texs["Sphere"] = texture("textures/Sphere.jpg", true, true);
+	/*************************************************************/
 
+	// ***** Set Light Attributes *****
 	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	light.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
 	light.set_range(20.0f);
 	light.set_power(1.0f);
+	/******************************************************/
 
-  // Load in shaders
+  // ***** Load In Shaders *****
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
   eff.add_shader("shaders/simple_texture.frag", GL_FRAGMENT_SHADER);
-  // Build effect
+  /****************************************************************/
+
+  // Build Effect
   eff.build();
 
-  // Set camera properties
+  // ***** Set Free Camera (Default) Properties *****
   cameras[1]->set_position(vec3(0.0f, 10.0f, 400.0f));
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
   cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 1000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+  /*****************************************************************************************************************/
   return true;
 }
 
@@ -198,6 +213,7 @@ bool update(float delta_time) {
 	meshes["SphereD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	//**************************************************************************************//
 
+	// ***** Movement for Spot Light *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
 		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
 	}
@@ -210,12 +226,18 @@ bool update(float delta_time) {
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
 		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
 	}
+	/*******************************************************/
+
+	// ***** Spot Light Intensity *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
 		range *= 1 + 0.5f * delta_time;
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_P)) {
 		range *= 1 - 0.5f * delta_time;
 	}
+	/***************************************************/
+
+	// ***** Spot Light Rotations *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_I)) {
 		light.rotate(vec3(0.3f, 0.0f, 0.0f));
 	}
@@ -228,49 +250,63 @@ bool update(float delta_time) {
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_L)) {
 		light.rotate(vec3(0.0f, -0.3f, 0.0f));
 	}
+	/***************************************************/
 
 	light.set_range(range);
 
+	// ***** Switch Back to Free Camera *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
 	{
 		cameraType = 1;
 	}
+	/**********************************************************/
+
+	// ***** Switch to Target Camera 1 *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_1))
 	{
 		cameraType = 0;
 		targetCam = 1;
 	}
+	// 2
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_2))
 	{
 		cameraType = 0;
 		targetCam = 2;
 	}
+	// 3
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_3))
 	{
 		cameraType = 0;
 		targetCam = 3;
 	}
+	// 4
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_4))
 	{
 		cameraType = 0;
 		targetCam = 4;
 	}
+	/**************************************************/
 
+	// ***** Target Camera Properties *****
 	if (cameraType == 0)
 	{
 		switch (targetCam) {
+		// If '1' is Pressed,
 		case 1:
 			cameras[0]->set_position(vec3(250.0f, 400.0f, -200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
 			break;
+		// If '2' is Pressed,
 		case 2:
 			cameras[0]->set_position(vec3(-250.0f, 400.0f, -200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
 			break;
+		// If '3' is Pressed,
 		case 3:
 			cameras[0]->set_position(vec3(250.0f, 400.0f, 200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
 			break;
+		// If '4' is Pressed,
 		case 4:
 			cameras[0]->set_position(vec3(-250.0f, 400.0f, 200.0f));
 			cameras[0]->set_target(vec3(0.0f, 0.0f, 0.0f));
@@ -280,6 +316,7 @@ bool update(float delta_time) {
 		cameras[0]->update(delta_time);
 	}
 
+	// ***** Free Camera Properties *****
 	static double ratio_width = quarter_pi<float>() / static_cast<float>(renderer::get_screen_width());
 	static double ratio_height =
 		(quarter_pi<float>() *
@@ -297,7 +334,9 @@ bool update(float delta_time) {
 	delta_x = delta_x * ratio_width;
 	delta_y = delta_y * ratio_height; 
 	static_cast<free_camera*>(cameras[1])->rotate(delta_x, -delta_y);
+	/***************************************************************/
 
+	// ***** Free Camera Movement *****
 	vec3 movement;
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) {
 		movement += vec3(0.0f, 0.0f, 5.0f);
@@ -311,6 +350,7 @@ bool update(float delta_time) {
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_D)) {
 		movement += vec3(5.0f, 0.0f, 0.0f);
 	}
+	/***************************************************/
 
 	static_cast<free_camera*>(cameras[1])->move(movement);
 	static_cast<free_camera*>(cameras[1])->update(delta_time);
@@ -321,6 +361,7 @@ bool update(float delta_time) {
 }
 
 texture BindingHelper(string name) {
+	// If the texture name contains the string 'Pillar'
 	if (name.substr(0, 6).compare("Pillar") == 0) {
 		return texs["Pillar"];
 	}
