@@ -13,7 +13,8 @@ array<camera*, 2> cameras;
 uint cameraType = 1;
 uint targetCam = 1;
 material mat;
-spot_light light;
+spot_light spotLight;
+point_light pointLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
@@ -174,16 +175,20 @@ bool load_content() {
 	/*************************************************************/
 
 	// ***** Set Light Attributes *****
-	light.set_position(vec3(0.0f, 10.0f, 150.0f));
-	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	light.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
-	light.set_range(20.0f);
-	light.set_power(1.0f);
+	spotLight.set_position(vec3(0.0f, 10.0f, 150.0f));
+	spotLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	spotLight.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
+	spotLight.set_range(20.0f);
+	spotLight.set_power(1.0f);
+
+	pointLight.set_position(vec3(0.0f, 175.0f, 0));
+	pointLight.set_light_colour(vec4(0.0f, 1.0f, 1.0f, 1.0f));
+	pointLight.set_range(20.0f);
 	/******************************************************/
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
-  eff.add_shader("shaders/simple_texture.frag", GL_FRAGMENT_SHADER);
+  eff.add_shader("shaders/part_spot.frag", GL_FRAGMENT_SHADER);
   /****************************************************************/
 
   // Build Effect
@@ -215,16 +220,16 @@ bool update(float delta_time) {
 
 	// ***** Movement for Spot Light *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_UP)) {
-		light.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
+		spotLight.move(vec3(0.0f, 0.0f, -20.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT)) {
-		light.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
+		spotLight.move(vec3(-20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_DOWN)) {
-		light.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
+		spotLight.move(vec3(0.0f, 0.0f, 20.0f) * delta_time);
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT)) {
-		light.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
+		spotLight.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	/*******************************************************/
 
@@ -239,20 +244,20 @@ bool update(float delta_time) {
 
 	// ***** Spot Light Rotations *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_I)) {
-		light.rotate(vec3(0.3f, 0.0f, 0.0f));
+		spotLight.rotate(vec3(0.3f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_K)) {
-		light.rotate(vec3(-0.3f, 0.0f, 0.0f));
+		spotLight.rotate(vec3(-0.3f, 0.0f, 0.0f));
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_J)) {
-		light.rotate(vec3(0.0f, 0.3f, 0.0f));
+		spotLight.rotate(vec3(0.0f, 0.3f, 0.0f));
 	}
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_L)) {
-		light.rotate(vec3(0.0f, -0.3f, 0.0f));
+		spotLight.rotate(vec3(0.0f, -0.3f, 0.0f));
 	}
 	/***************************************************/
 
-	light.set_range(range);
+	spotLight.set_range(range);
 
 	// ***** Switch Back to Free Camera *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
@@ -400,7 +405,7 @@ bool render() {
 		glUniformMatrix4fv(eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(M));
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
-		renderer::bind(light, "spot");
+		renderer::bind(spotLight, "spot");
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);

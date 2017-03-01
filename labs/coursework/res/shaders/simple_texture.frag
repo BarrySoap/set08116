@@ -28,24 +28,18 @@ layout(location = 2) in vec2 tex_coord;
 
 layout(location = 0) out vec4 colour;
 
-void main() {
-  vec3 lightDirection = normalize(spot.position - vertex_position);
-  float distance = distance(spot.position, vertex_position);
-  float attFactor = spot.constant + (spot.linear * distance) + (spot.quadratic * distance * distance);
-  float intensity = pow(max(dot((-1 * spot.direction), lightDirection), 0.0f), spot.power);
-  vec4 lightColour = spot.light_colour * (intensity / attFactor);
-  vec3 viewDirection = normalize(eye_pos - vertex_position);
+vec4 calculate_spot(in spot_light spot, in material mat, in vec3 vertex_position, in vec3 transformed_normal, in vec3 view_dir, in vec4 tex_colour)
+{
+	vec3 lightDirection = normalize(spot.position - position);
+	float dist = distance(spot.position,position);
+	float attFactor = (spot.constant + spot.linear * dist + spot.quadratic * dist * dist);
+	float intensity = pow(max(dot(-1*spot.direction, lightDirection), 0.0f), spot.power);
+	vec4 light_colour = (intensity / attFactor) * spot.light_colour;
+	vec4 diffuse = (mat.diffuse_reflection * light_colour) * max(dot(transformed_normal, lightDirection), 0.0);
+	vec3 H = normalize(lightDirection + view_dir);
+	vec4 specular = (mat.specular_reflection * light_colour) * pow(max(dot(transformed_normal, H), 0.0), mat.shininess);	
+	vec4 colour = ((mat.emissive + diffuse) * tex_colour) + specular;
+	colour.a = 1.0;
 
-  float k1 = max(dot(transformed_normal, lightDirection), 0.0f);
-
-  vec4 diffuse = k1 * (mat.diffuse_reflection * lightColour);
-
-  vec3 H = normalize(lightDirection + viewDirection);
-  float k2 = pow(max(dot(transformed_normal, H), 0.0f), mat.shininess);
-  vec4 specular = k2 * (mat.specular_reflection * lightColour);
-
-  vec4 texSample = texture(tex, tex_coord);
-  vec4 primary = mat.emissive + diffuse;
-  colour = primary * texSample + specular;
-  colour.a = 1.0f;
+	return colour;
 }
