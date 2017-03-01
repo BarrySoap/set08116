@@ -181,14 +181,14 @@ bool load_content() {
 	spotLight.set_range(20.0f);
 	spotLight.set_power(1.0f);
 
-	pointLight.set_position(vec3(0.0f, 175.0f, 0));
+	pointLight.set_position(vec3(0.0f, 270.0f, 0));
 	pointLight.set_light_colour(vec4(0.0f, 1.0f, 1.0f, 1.0f));
 	pointLight.set_range(20.0f);
 	/******************************************************/
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
-  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag"/*, "shaders/part_spot.frag"*/ };
+  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag" };
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   /****************************************************************/
 
@@ -393,6 +393,7 @@ texture BindingHelper(string name) {
 }
 
 bool render() {
+	glDisable(GL_CULL_FACE);
 	for (auto &e : meshes) {
 		auto m = e.second;
 		// Bind effect

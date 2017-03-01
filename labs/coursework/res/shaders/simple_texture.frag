@@ -52,7 +52,8 @@ layout(location = 0) out vec4 colour;
 void main () {
 	vec3 view_dir = normalize(eye_pos - vertex_position);
 	vec4 tex_colour = texture(tex, tex_coord);
+	colour = vec4(0.0f);
 	colour += calculate_point(point, mat, vertex_position, transformed_normal, view_dir, tex_colour);
-	//colour += calculate_spot(spot, mat, vertex_position, transformed_normal, view_dir, tex_colour);
-	colour = tex_colour;
+	colour += calculate_spot(spot, mat, vertex_position, transformed_normal, view_dir, tex_colour);
+	colour.a = 1.0f;
 }

@@ -1,5 +1,7 @@
+
 #ifndef POINT_LIGHT
 #define POINT_LIGHT
+
 struct point_light
 {
 	vec4 light_colour;
