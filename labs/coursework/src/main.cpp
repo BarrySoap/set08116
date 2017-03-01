@@ -33,11 +33,15 @@ bool initialise() {
 
 bool load_content() {
 	// ***** Create Plane/Flooring *****
-	meshes["Floor"] = mesh(geometry_builder::create_plane(250, 400));
+	meshes["Floor"] = mesh(geometry_builder::create_plane());
 	meshes["FloorB"] = mesh(geometry_builder::create_box(vec3(50.0f, 2.0f, 10.0f)));
-
+	meshes["Carpet"] = mesh(geometry_builder::create_box(vec3(10.0f, 1.0f, 72.0f)));
+	// ***** Move and Scale *****
+	meshes["Floor"].get_transform().scale = vec3(2.5f, 1.0f, 4.0f);
 	meshes["FloorB"].get_transform().scale = vec3(5.0f);
 	meshes["FloorB"].get_transform().position = vec3(0.0f, 5.0f, -170.0f);
+	meshes["Carpet"].get_transform().scale = vec3(5.0f, 1.0f, 5.0f);
+	meshes["Carpet"].get_transform().position = vec3(0.0f, 0.0f, 10.0f);
 	//**********************************************************************************/
 
 	// ***** Create Front Walls *****
@@ -109,19 +113,19 @@ bool load_content() {
 	//**********************************************************************************//
 
 	// ***** Create Stands *****
-	meshes["Stand"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
-	meshes["StandB"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
-	meshes["StandC"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
-	meshes["StandD"] = mesh(geometry_builder::create_box(vec3(2.0f, 5.0f, 2.0f)));
+	meshes["Stand"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
+	meshes["StandB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
+	meshes["StandC"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
+	meshes["StandD"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
 	// ***** Move and Scale *****
 	meshes["Stand"].get_transform().scale = vec3(5.0f);
-	meshes["Stand"].get_transform().position = vec3(70.0f, 13.0f, 80.0f);
+	meshes["Stand"].get_transform().position = vec3(70.0f, 50.0f, 80.0f);
 	meshes["StandB"].get_transform().scale = vec3(5.0f);
-	meshes["StandB"].get_transform().position = vec3(-70.0f, 13.0f, 80.0f);
+	meshes["StandB"].get_transform().position = vec3(-70.0f, 50.0f, 80.0f);
 	meshes["StandC"].get_transform().scale = vec3(5.0f);
-	meshes["StandC"].get_transform().position = vec3(70.0f, 13.0f, -80.0f);
+	meshes["StandC"].get_transform().position = vec3(70.0f, 50.0f, -80.0f);
 	meshes["StandD"].get_transform().scale = vec3(5.0f);
-	meshes["StandD"].get_transform().position = vec3(-70.0f, 13.0f, -80.0f);
+	meshes["StandD"].get_transform().position = vec3(-70.0f, 50.0f, -80.0f);
 	//*************************************************************************//
 
 	// ***** Create Torus' *****
@@ -129,31 +133,27 @@ bool load_content() {
 	meshes["TorusB"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
 	meshes["TorusC"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
 	meshes["TorusD"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusE"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusF"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusG"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
+	meshes["TorusH"] = mesh(geometry_builder::create_torus(20, 20, 1.0f, 3.0f));
 	// ***** Move and Scale *****
 	meshes["Torus"].get_transform().scale = vec3(5.0f);
-	meshes["Torus"].get_transform().position = vec3(70.0f, 20.0f, 80.0f);
+	meshes["Torus"].get_transform().position = vec3(70.0f, 5.0f, 80.0f);
 	meshes["TorusB"].get_transform().scale = vec3(5.0f);
-	meshes["TorusB"].get_transform().position = vec3(-70.0f, 20.0f, 80.0f);
+	meshes["TorusB"].get_transform().position = vec3(-70.0f, 5.0f, 80.0f);
 	meshes["TorusC"].get_transform().scale = vec3(5.0f);
-	meshes["TorusC"].get_transform().position = vec3(70.0f, 20.0f, -80.0f);
+	meshes["TorusC"].get_transform().position = vec3(70.0f, 5.0f, -80.0f);
 	meshes["TorusD"].get_transform().scale = vec3(5.0f);
-	meshes["TorusD"].get_transform().position = vec3(-70.0f, 20.0f, -80.0f);
-	//************************************************************************//
-
-	// ***** Create Spheres *****
-	meshes["Sphere"] = mesh(geometry_builder::create_sphere(20, 20));
-	meshes["SphereB"] = mesh(geometry_builder::create_sphere(20, 20));
-	meshes["SphereC"] = mesh(geometry_builder::create_sphere(20, 20));
-	meshes["SphereD"] = mesh(geometry_builder::create_sphere(20, 20));
-	// ***** Move and Scale *****
-	meshes["Sphere"].get_transform().scale = vec3(5.0f);
-	meshes["Sphere"].get_transform().position = vec3(70.0f, 30.0f, 80.0f);
-	meshes["SphereB"].get_transform().scale = vec3(5.0f);
-	meshes["SphereB"].get_transform().position = vec3(-70.0f, 30.0f, 80.0f);
-	meshes["SphereC"].get_transform().scale = vec3(5.0f);
-	meshes["SphereC"].get_transform().position = vec3(70.0f, 30.0f, -80.0f);
-	meshes["SphereD"].get_transform().scale = vec3(5.0f);
-	meshes["SphereD"].get_transform().position = vec3(-70.0f, 30.0f, -80.0f);
+	meshes["TorusD"].get_transform().position = vec3(-70.0f, 5.0f, -80.0f);
+	meshes["TorusE"].get_transform().scale = vec3(5.0f);
+	meshes["TorusE"].get_transform().position = vec3(70.0f, 95.0f, 80.0f);
+	meshes["TorusF"].get_transform().scale = vec3(5.0f);
+	meshes["TorusF"].get_transform().position = vec3(-70.0f, 95.0f, 80.0f);
+	meshes["TorusG"].get_transform().scale = vec3(5.0f);
+	meshes["TorusG"].get_transform().position = vec3(70.0f, 95.0f, -80.0f);
+	meshes["TorusH"].get_transform().scale = vec3(5.0f);
+	meshes["TorusH"].get_transform().position = vec3(-70.0f, 95.0f, -80.0f);
 	//************************************************************************//
 
 	// ***** Set Material Attributes *****
@@ -170,11 +170,11 @@ bool load_content() {
 	texs["Pillar"] = texture("textures/Pillar.jpg", true, true);
 	texs["Stand"] = texture("textures/Pillar.jpg", true, true);
 	texs["Torus"] = texture("textures/Torus.jpg", true, true);
-	texs["Sphere"] = texture("textures/Sphere.jpg", true, true);
+	texs["Carpet"] = texture("textures/Carpet.jpg", true, true);
 	/*************************************************************/
 
 	// ***** Set Light Attributes *****
-	light.set_position(vec3(-25.0f, 10.0f, -10.0f));
+	light.set_position(vec3(0.0f, 10.0f, 150.0f));
 	light.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	light.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
 	light.set_range(20.0f);
@@ -202,15 +202,15 @@ bool load_content() {
 bool update(float delta_time) {
 	static float range = 70.0f;
 
-	// ***** Rotate the torus' and spheres along the y axis *****
+	// ***** Rotate the torus' along the y axis *****
 	meshes["Torus"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	meshes["TorusB"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	meshes["TorusC"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	meshes["TorusD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
-	meshes["Sphere"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
-	meshes["SphereB"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
-	meshes["SphereC"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
-	meshes["SphereD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusE"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusF"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusG"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusH"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
 	//**************************************************************************************//
 
 	// ***** Movement for Spot Light *****
@@ -379,9 +379,6 @@ texture BindingHelper(string name) {
 	}
 	else if (name.substr(0, 5).compare("Torus") == 0) {
 		return texs["Torus"];
-	}
-	else if (name.substr(0, 6).compare("Sphere") == 0) {
-		return texs["Sphere"];
 	}
 	else {
 		return texs[name];
