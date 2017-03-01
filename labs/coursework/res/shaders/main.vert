@@ -1,4 +1,4 @@
-#version 440
+#version 450
 
 // Model transformation matrix
 uniform mat4 M;

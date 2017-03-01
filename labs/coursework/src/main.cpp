@@ -187,8 +187,9 @@ bool load_content() {
 	/******************************************************/
 
   // ***** Load In Shaders *****
-  eff.add_shader("shaders/simple_texture.vert", GL_VERTEX_SHADER);
-  eff.add_shader("shaders/part_spot.frag", GL_FRAGMENT_SHADER);
+  eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
+  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag"/*, "shaders/part_spot.frag"*/ };
+  eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   /****************************************************************/
 
   // Build Effect
@@ -258,6 +259,7 @@ bool update(float delta_time) {
 	/***************************************************/
 
 	spotLight.set_range(range);
+	pointLight.set_range(range);
 
 	// ***** Switch Back to Free Camera *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
@@ -406,6 +408,7 @@ bool render() {
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(spotLight, "spot");
+		renderer::bind(pointLight, "point");
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);

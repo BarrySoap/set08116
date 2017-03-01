@@ -1,51 +1,38 @@
-#version 440
-
-struct spot_light {
-  vec4 light_colour;
-  vec3 position;
-  vec3 direction;
-  float constant;
-  float linear;
-  float quadratic;
-  float power;
+#ifndef SPOT_LIGHT
+#define SPOT_LIGHT
+struct spot_light{
+	vec4 light_colour;
+	vec3 position;
+	vec3 direction;
+	float constant;
+	float linear;
+	float quadratic;
+	float power;
 };
+#endif
 
-struct material {
-  vec4 emissive;
-  vec4 diffuse_reflection;
-  vec4 specular_reflection;
-  float shininess;
+#ifndef MATERIAL
+#define MATERIAL
+struct material{
+	vec4 emissive;
+	vec4 diffuse_reflection;
+	vec4 specular_reflection;
+	float shininess;
 };
+#endif
 
-uniform spot_light spot;
-uniform material mat;
-uniform vec3 eye_pos;
-uniform sampler2D tex;
+vec4 calculate_spot (in spot_light spot, in material mat, in vec3 position, in vec3 normal, in vec3 view_dir, in vec4 tex_colour) {
+	float dist = distance(light.position, position);
+	vec3 lightDirection = normalize(light.position - position);
+	float attFactor = (spot.constant + spot.linear * dist + spot.quadratic * dist * dist);
+	float intensity = max(dot(-1 * light.direction, lightDirection), 0.0f);
+	vec4 light_colour = (light_intensity / attenuationFac) * spot.light_colour;
+	vec4 diffuse = (mat.diffuse_reflection * light_colour) * max(dot(normal, light_dir), 0.0);
 
-layout(location = 0) in vec3 vertex_position;
-layout(location = 1) in vec3 transformed_normal;
-layout(location = 2) in vec2 tex_coord;
+	vec3 H = normalize(lightDirection + view_dir);
+	vec4 specular = (mat.specular_reflection * light_colour) * pow(max(dot(normal, H), 0.0f), mat.shininess);
 
-layout(location = 0) out vec4 colour;
-
-void main() {
-  vec3 lightDirection = normalize(spot.position - vertex_position);
-  float distance = distance(spot.position, vertex_position);
-  float attFactor = spot.constant + (spot.linear * distance) + (spot.quadratic * distance * distance);
-  float intensity = pow(max(dot((-1 * spot.direction), lightDirection), 0.0f), spot.power);
-  vec4 lightColour = spot.light_colour * (intensity / attFactor);
-  vec3 viewDirection = normalize(eye_pos - vertex_position);
-
-  float k1 = max(dot(transformed_normal, lightDirection), 0.0f);
-
-  vec4 diffuse = k1 * (mat.diffuse_reflection * lightColour);
-
-  vec3 H = normalize(lightDirection + viewDirection);
-  float k2 = pow(max(dot(transformed_normal, H), 0.0f), mat.shininess);
-  vec4 specular = k2 * (mat.specular_reflection * lightColour);
-
-  vec4 texSample = texture(tex, tex_coord);
-  vec4 primary = mat.emissive + diffuse;
-  colour = primary * texSample + specular;
-  colour.a = 1.0f;
+	vec4 colour = ((mat.emissive + diffuse) * tex_colour) + specular;
+	colour.a = 1.0;
+	return colour;
 }
