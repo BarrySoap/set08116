@@ -14,7 +14,8 @@ uint cameraType = 1;
 uint targetCam = 1;
 material mat;
 spot_light spotLight;
-vector<point_light> pointLights(5);
+vector<point_light> pointLights(6);
+directional_light directLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
@@ -35,7 +36,7 @@ bool initialise() {
 bool load_content() {
 	// ***** Create Plane/Flooring *****
 	meshes["Floor"] = mesh(geometry_builder::create_plane());
-	meshes["FloorB"] = mesh(geometry_builder::create_box(vec3(50.0f, 2.0f, 10.0f)));
+	meshes["FloorB"] = mesh(geometry_builder::create_box(vec3(49.0f, 2.0f, 10.0f)));
 	meshes["Carpet"] = mesh(geometry_builder::create_box(vec3(10.0f, 1.0f, 72.0f)));
 	// ***** Move and Scale *****
 	meshes["Floor"].get_transform().scale = vec3(2.5f, 1.0f, 4.0f);
@@ -159,7 +160,7 @@ bool load_content() {
 
 	// ***** Set Material Attributes *****
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	mat.set_specular(vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
@@ -173,14 +174,14 @@ bool load_content() {
 	meshes["WallRight"].set_material(mat);
 	meshes["WallTop"].set_material(mat);
 	meshes["WallBack"].set_material(mat);
-
-	mat.set_specular(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	meshes["Roof"].set_material(mat);
 
+	mat.set_specular(vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	mat.set_diffuse(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	meshes["Carpet"].set_material(mat);
-	
-	mat.set_diffuse(vec4(0.3f, 0.3f, 0.3f, 1.0f));
+
+	mat.set_specular(vec4(0.8f, 0.8f, 0.8f, 1.0f));
+	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	meshes["PillarFront"].set_material(mat);
 	meshes["PillarFrontB"].set_material(mat);
 	meshes["PillarBack"].set_material(mat);
@@ -190,8 +191,8 @@ bool load_content() {
 	meshes["StandC"].set_material(mat);
 	meshes["StandD"].set_material(mat);
 
-	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	mat.set_diffuse(vec4(0.8f, 0.8f, 0.8f, 1.0f));
+	mat.set_specular(vec4(0.3f, 0.3f, 0.3f, 1.0f));
+	mat.set_diffuse(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	meshes["Torus"].set_material(mat);
 	meshes["TorusB"].set_material(mat);
 	meshes["TorusC"].set_material(mat);
@@ -219,7 +220,7 @@ bool load_content() {
 	spotLight.set_range(20.0f);
 	spotLight.set_power(1.0f);
 
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 6; ++i) {
 		pointLights[i].set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		pointLights[i].set_range(20.0f);
 	}
@@ -229,11 +230,16 @@ bool load_content() {
 	pointLights[2].set_position(vec3(-137.5f, 270.0f, 190.0f));
 	pointLights[3].set_position(vec3(137.5f, 270.0f, -190.0f));
 	pointLights[4].set_position(vec3(-137.5f, 270.0f, -190.0f));
+	pointLights[5].set_position(vec3(0.0f, 20.0f, 250.0f));
+
+	directLight.set_ambient_intensity(vec4(0.1f, 0.1f, 0.1f, 1.0f));
+	directLight.set_direction(normalize(vec3(0.0f, 1.0f, 0.0f)));
+	directLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	/******************************************************/
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
-  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag" };
+  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag"};
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   /****************************************************************/
 
@@ -251,6 +257,7 @@ bool load_content() {
 
 
 bool update(float delta_time) {
+	cout << 1.0f / delta_time << endl;
 	static float range = 70.0f;
 
 	// ***** Rotate the torus' along the y axis *****
@@ -305,7 +312,7 @@ bool update(float delta_time) {
 
 	// ***** Set Light Ranges *****
 	spotLight.set_range(range);
-	for (int i = 0; i < 5; ++i) {
+	for (int i = 0; i < 6; ++i) {
 		pointLights[i].set_range(range);
 	}
 	/*****************************/
@@ -459,6 +466,7 @@ bool render() {
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(spotLight, "spot");
 		renderer::bind(pointLights, "points");
+		renderer::bind(directLight, "direct");
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
@@ -481,4 +489,7 @@ void main() {
   application.set_render(render);
   // Run application
   application.run();
+
+  delete cameras[0];
+  delete cameras[1];
 }
