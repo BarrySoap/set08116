@@ -159,13 +159,12 @@ bool load_content() {
 
 	// ***** Set Material Attributes *****
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	mat.set_specular(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	mat.set_shininess(25.0f);
-	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 
 	meshes["Floor"].set_material(mat);
 	meshes["FloorB"].set_material(mat);
-	meshes["Carpet"].set_material(mat);
 	meshes["WallFrontA"].set_material(mat);
 	meshes["WallFrontB"].set_material(mat);
 	meshes["WallFrontAB"].set_material(mat);
@@ -174,7 +173,14 @@ bool load_content() {
 	meshes["WallRight"].set_material(mat);
 	meshes["WallTop"].set_material(mat);
 	meshes["WallBack"].set_material(mat);
+
+	mat.set_specular(vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
 	meshes["Roof"].set_material(mat);
+
+	meshes["Carpet"].set_material(mat);
+	
+	mat.set_diffuse(vec4(0.3f, 0.3f, 0.3f, 1.0f));
 	meshes["PillarFront"].set_material(mat);
 	meshes["PillarFrontB"].set_material(mat);
 	meshes["PillarBack"].set_material(mat);
@@ -183,6 +189,9 @@ bool load_content() {
 	meshes["StandB"].set_material(mat);
 	meshes["StandC"].set_material(mat);
 	meshes["StandD"].set_material(mat);
+
+	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	mat.set_diffuse(vec4(0.8f, 0.8f, 0.8f, 1.0f));
 	meshes["Torus"].set_material(mat);
 	meshes["TorusB"].set_material(mat);
 	meshes["TorusC"].set_material(mat);
