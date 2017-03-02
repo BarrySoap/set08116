@@ -195,7 +195,7 @@ bool load_content() {
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
-  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag" };
+  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag" };
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   /****************************************************************/
 
@@ -422,6 +422,7 @@ bool render() {
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
+		glUniform1i(eff.get_uniform_location("normal_map"), 1);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
 		// Render geometry
