@@ -39,7 +39,7 @@ vec4 calculate_spot (in spot_light spot, in material mat, in vec3 position, in v
 
 uniform sampler2D tex;
 uniform vec3 eye_pos;
-uniform point_light point;
+uniform point_light points[5];
 uniform spot_light spot;
 uniform material mat;
 
@@ -53,7 +53,10 @@ void main () {
 	vec3 view_dir = normalize(eye_pos - vertex_position);
 	vec4 tex_colour = texture(tex, tex_coord);
 	colour = vec4(0.0f);
-	colour += calculate_point(point, mat, vertex_position, transformed_normal, view_dir, tex_colour);
+	for(int i = 0; i < 5; i++)
+	{
+		colour += calculate_point(points[i], mat, vertex_position, transformed_normal, view_dir, tex_colour);
+	}
 	colour += calculate_spot(spot, mat, vertex_position, transformed_normal, view_dir, tex_colour);
 	colour.a = 1.0f;
 }

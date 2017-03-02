@@ -14,7 +14,7 @@ uint cameraType = 1;
 uint targetCam = 1;
 material mat;
 spot_light spotLight;
-point_light pointLight;
+vector<point_light> pointLights(5);
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 
@@ -181,9 +181,16 @@ bool load_content() {
 	spotLight.set_range(20.0f);
 	spotLight.set_power(1.0f);
 
-	pointLight.set_position(vec3(0.0f, 270.0f, 0));
-	pointLight.set_light_colour(vec4(0.0f, 1.0f, 1.0f, 1.0f));
-	pointLight.set_range(20.0f);
+	for (int i = 0; i < 5; ++i) {
+		pointLights[i].set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		pointLights[i].set_range(20.0f);
+	}
+
+	pointLights[0].set_position(vec3(0.0f, 270.0f, 0));
+	pointLights[1].set_position(vec3(137.5f, 270.0f, 190.0f));
+	pointLights[2].set_position(vec3(-137.5f, 270.0f, 190.0f));
+	pointLights[3].set_position(vec3(137.5f, 270.0f, -190.0f));
+	pointLights[4].set_position(vec3(-137.5f, 270.0f, -190.0f));
 	/******************************************************/
 
   // ***** Load In Shaders *****
@@ -259,7 +266,9 @@ bool update(float delta_time) {
 	/***************************************************/
 
 	spotLight.set_range(range);
-	pointLight.set_range(range);
+	for (int i = 0; i < 5; ++i) {
+		pointLights[i].set_range(range);
+	}
 
 	// ***** Switch Back to Free Camera *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
@@ -409,7 +418,7 @@ bool render() {
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
 		renderer::bind(spotLight, "spot");
-		renderer::bind(pointLight, "point");
+		renderer::bind(pointLights, "points");
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
