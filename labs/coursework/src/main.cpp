@@ -162,6 +162,35 @@ bool load_content() {
 	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	mat.set_shininess(25.0f);
 	mat.set_diffuse(vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+	meshes["Floor"].set_material(mat);
+	meshes["FloorB"].set_material(mat);
+	meshes["Carpet"].set_material(mat);
+	meshes["WallFrontA"].set_material(mat);
+	meshes["WallFrontB"].set_material(mat);
+	meshes["WallFrontAB"].set_material(mat);
+	meshes["WallRight"].set_material(mat);
+	meshes["WallLeft"].set_material(mat);
+	meshes["WallRight"].set_material(mat);
+	meshes["WallTop"].set_material(mat);
+	meshes["WallBack"].set_material(mat);
+	meshes["Roof"].set_material(mat);
+	meshes["PillarFront"].set_material(mat);
+	meshes["PillarFrontB"].set_material(mat);
+	meshes["PillarBack"].set_material(mat);
+	meshes["PillarBackB"].set_material(mat);
+	meshes["Stand"].set_material(mat);
+	meshes["StandB"].set_material(mat);
+	meshes["StandC"].set_material(mat);
+	meshes["StandD"].set_material(mat);
+	meshes["Torus"].set_material(mat);
+	meshes["TorusB"].set_material(mat);
+	meshes["TorusC"].set_material(mat);
+	meshes["TorusD"].set_material(mat);
+	meshes["TorusE"].set_material(mat);
+	meshes["TorusF"].set_material(mat);
+	meshes["TorusG"].set_material(mat);
+	meshes["TorusH"].set_material(mat);
 	/*********************************************/
 
 	// ***** Initialise Textures *****
@@ -265,10 +294,12 @@ bool update(float delta_time) {
 	}
 	/***************************************************/
 
+	// ***** Set Light Ranges *****
 	spotLight.set_range(range);
 	for (int i = 0; i < 5; ++i) {
 		pointLights[i].set_range(range);
 	}
+	/*****************************/
 
 	// ***** Switch Back to Free Camera *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_SHIFT))
