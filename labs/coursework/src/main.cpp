@@ -12,6 +12,8 @@ map<string, texture> texs;
 array<camera*, 2> cameras;
 uint cameraType = 1;
 uint targetCam = 1;
+texture normalMap;
+texture blankNormal;
 material mat;
 spot_light spotLight;
 vector<point_light> pointLights(6);
@@ -211,6 +213,9 @@ bool load_content() {
 	texs["Stand"] = texture("textures/Pillar.jpg", true, true);
 	texs["Torus"] = texture("textures/Torus.jpg", true, true);
 	texs["Carpet"] = texture("textures/Carpet.jpg", true, true);
+
+	normalMap = texture("textures/RoofNormalMap.jpg", true, true);
+	blankNormal = texture("textures/BlankNormal.jpg", true, true);
 	/*************************************************************/
 
 	// ***** Set Light Attributes *****
@@ -470,6 +475,8 @@ bool render() {
 		renderer::bind(BindingHelper(e.first), 0);
 
 		glUniform1i(eff.get_uniform_location("tex"), 0);
+
+		renderer::bind(normalMap, 1);
 		glUniform1i(eff.get_uniform_location("normal_map"), 1);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
