@@ -472,12 +472,17 @@ bool render() {
 		renderer::bind(spotLight, "spot");
 		renderer::bind(pointLights, "points");
 		renderer::bind(directLight, "direct");
+
+		glUniform1i(eff.get_uniform_location("blankNormal"), 1);
+		if (e.first == "Pillar") {
+			renderer::bind(normalMap, 1);
+		}
+
 		renderer::bind(BindingHelper(e.first), 0);
-
-		glUniform1i(eff.get_uniform_location("tex"), 0);
-
 		renderer::bind(normalMap, 1);
-		glUniform1i(eff.get_uniform_location("normal_map"), 1);
+		
+		glUniform1i(eff.get_uniform_location("tex"), 0);
+		glUniform1i(eff.get_uniform_location("normalMap"), 2);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
 		// Render geometry
