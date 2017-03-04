@@ -6,6 +6,7 @@ using namespace graphics_framework;
 using namespace glm;
 
 map<string, mesh> meshes;
+map<mesh*, mesh*> transformed_hierarchy;
 geometry geom;
 effect eff;
 map<string, texture> texs;
@@ -150,15 +151,21 @@ bool load_content() {
 	meshes["TorusC"].get_transform().position = vec3(70.0f, 5.0f, -80.0f);
 	meshes["TorusD"].get_transform().scale = vec3(5.0f);
 	meshes["TorusD"].get_transform().position = vec3(-70.0f, 5.0f, -80.0f);
-	meshes["TorusE"].get_transform().scale = vec3(5.0f);
-	meshes["TorusE"].get_transform().position = vec3(70.0f, 95.0f, 80.0f);
-	meshes["TorusF"].get_transform().scale = vec3(5.0f);
-	meshes["TorusF"].get_transform().position = vec3(-70.0f, 95.0f, 80.0f);
-	meshes["TorusG"].get_transform().scale = vec3(5.0f);
-	meshes["TorusG"].get_transform().position = vec3(70.0f, 95.0f, -80.0f);
-	meshes["TorusH"].get_transform().scale = vec3(5.0f);
-	meshes["TorusH"].get_transform().position = vec3(-70.0f, 95.0f, -80.0f);
 	//************************************************************************//
+
+	// ***** Set Transform Hierarchies *****
+	transformed_hierarchy[&meshes["TorusE"]] = &meshes["Torus"];
+	transformed_hierarchy[&meshes["TorusF"]] = &meshes["TorusB"];
+	transformed_hierarchy[&meshes["TorusG"]] = &meshes["TorusC"];
+	transformed_hierarchy[&meshes["TorusH"]] = &meshes["TorusD"];
+	/************************************************************/
+
+	// ***** Move child Torus' so they're not in the same pos as parent
+	meshes["TorusE"].get_transform().position = vec3(0.0f, 17.5f, 0.0f);
+	meshes["TorusF"].get_transform().position = vec3(0.0f, 17.5f, 0.0f);
+	meshes["TorusG"].get_transform().position = vec3(0.0f, 17.5f, 0.0f);
+	meshes["TorusH"].get_transform().position = vec3(0.0f, 17.5f, 0.0f);
+	/******************************************************************/
 
 	// ***** Set Material Attributes *****
 	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
@@ -270,10 +277,10 @@ bool update(float delta_time) {
 	meshes["TorusB"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	meshes["TorusC"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	meshes["TorusD"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
-	meshes["TorusE"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
-	meshes["TorusF"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
-	meshes["TorusG"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
-	meshes["TorusH"].get_transform().rotate(vec3(0.0f, -half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusE"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusF"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusG"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
+	meshes["TorusH"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
 	//**************************************************************************************//
 
 	// ***** Movement for Spot Light *****
@@ -460,7 +467,15 @@ bool render() {
 		// Bind effect
 		renderer::bind(eff);
 		// Create MVP matrix
-		auto M = m.get_transform().get_transform_matrix();
+		mat4 M;
+
+		if (e.first == "TorusE" || e.first == "TorusF" || e.first == "TorusG" || e.first == "TorusH") {
+			mat4 hierarchy_M = (*transformed_hierarchy[&e.second]).get_transform().get_transform_matrix();
+			M = hierarchy_M * m.get_transform().get_transform_matrix();
+		}
+		else {
+			M = m.get_transform().get_transform_matrix();
+		}
 		auto V = cameras[cameraType]->get_view();
 		auto P = cameras[cameraType]->get_projection();
 		auto MVP = P * V * M;
@@ -474,7 +489,7 @@ bool render() {
 		renderer::bind(directLight, "direct");
 
 		glUniform1i(eff.get_uniform_location("blankNormal"), 1);
-		if (e.first == "Pillar") {
+		if (e.first == "Roof") {
 			renderer::bind(normalMap, 1);
 		}
 
