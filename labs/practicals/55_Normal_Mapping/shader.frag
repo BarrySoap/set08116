@@ -1,4 +1,4 @@
-#version 440
+#version 450 core
 // This shader requires direction.frag and normal_map.frag
 
 // Directional light structure
@@ -55,12 +55,12 @@ layout(location = 0) out vec4 colour;
 void main() {
   // *********************************
   // Sample texture
-  vec4 tex_colour = texture(tex, tex_coord);
+  vec4 tex_col = texture(tex, tex_coord);
   // Calculate view direction
   vec3 view_dir = normalize(eye_pos - position);
   // Calculate normal from normal map
   vec3 calculatedNormal = calc_normal(normal, tangent, binormal, normal_map, tex_coord);
   // Calculate directional light
-  colour = calculate_direction(light, mat, calculatedNormal, view_dir, tex_colour);
+  colour = calculate_direction(light, mat, calculatedNormal, view_dir, tex_col);
   // *********************************
 }
