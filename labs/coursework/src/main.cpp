@@ -251,7 +251,7 @@ bool load_content() {
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
-  vector<string> frag_shaders{ "shaders/simple_texture.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag"};
+  vector<string> frag_shaders{ "shaders/main.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag"};
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   /****************************************************************/
 
