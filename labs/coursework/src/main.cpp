@@ -7,8 +7,10 @@ using namespace glm;
 
 map<string, mesh> meshes;
 map<mesh*, mesh*> transformed_hierarchy;
+mesh skybox;
 geometry geom;
 effect eff;
+effect sky_eff;
 map<string, texture> texs;
 array<camera*, 2> cameras;
 uint cameraType = 1;
@@ -16,6 +18,7 @@ uint targetCam = 1;
 texture normalMap;
 texture blankNormal;
 material mat;
+cubemap cube_map;
 spot_light spotLight;
 vector<point_light> pointLights(6);
 directional_light directLight;
@@ -153,6 +156,11 @@ bool load_content() {
 	meshes["TorusD"].get_transform().position = vec3(-70.0f, 5.0f, -80.0f);
 	//************************************************************************//
 
+	// ***** Create Skybox Mesh *****
+	skybox = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
+	skybox.get_transform().scale *= vec3(100);
+	/****************************************/
+
 	// ***** Set Transform Hierarchies *****
 	transformed_hierarchy[&meshes["TorusE"]] = &meshes["Torus"];
 	transformed_hierarchy[&meshes["TorusF"]] = &meshes["TorusB"];
@@ -223,6 +231,8 @@ bool load_content() {
 
 	normalMap = texture("textures/RoofNormalMap.jpg", true, true);
 	blankNormal = texture("textures/BlankNormal.jpg", true, true);
+	array<string, 6> filenames = { "textures/sahara_ft.jpg", "textures/sahara_bk.jpg", "textures/sahara_up.jpg",
+		"textures/sahara_dn.jpg", "textures/sahara_rt.jpg", "textures/sahara_lf.jpg" };
 	/*************************************************************/
 
 	// ***** Set Light Attributes *****
@@ -249,10 +259,18 @@ bool load_content() {
 	directLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	/******************************************************/
 
+	// ***** Create cube map *****
+	cube_map = cubemap(filenames);
+	/****************************/
+
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
   vector<string> frag_shaders{ "shaders/main.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag"};
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
+
+  sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
+  sky_eff.add_shader("shaders/skybox.frag", GL_FRAGMENT_SHADER);
+  sky_eff.build();
   /****************************************************************/
 
   // Build Effect
@@ -269,6 +287,7 @@ bool load_content() {
 
 
 bool update(float delta_time) {
+	skybox.get_transform().position = cameras[1]->get_position();
 	cout << 1.0f / delta_time << endl;
 	static float range = 70.0f;
 
@@ -461,7 +480,29 @@ texture BindingHelper(string name) {
 }
 
 bool render() {
+	// ***** Skybox Stuff *****
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
+	
+	renderer::bind(sky_eff);
+	
+	auto M = skybox.get_transform().get_transform_matrix();
+	auto V = cameras[cameraType]->get_view();
+	auto P = cameras[cameraType]->get_projection();
+	auto MVP = P * V * M;
+	
+	glUniformMatrix4fv(sky_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+	
+	glUniform1i(sky_eff.get_uniform_location("cubemap"), 0);
+
+	renderer::render(skybox);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
+	/***************************************************/
+
 	for (auto &e : meshes) {
 		auto m = e.second;
 		// Bind effect
