@@ -48,7 +48,7 @@ bool update(float delta_time) {
   // Set skybox position to camera position (camera in centre of skybox)
   skybox.get_transform().position = cam.get_position();
   // rotate the sphere
-  sphere.get_transform().rotate(vec3(0.0f, 1.0f, 0.0f));
+  sphere.get_transform().rotate(vec3(1.0f, 0.0f, 0.0f));
   // *********************************
   return true;
 }
@@ -88,11 +88,11 @@ bool render() {
   // Set M matrix uniform
 	glUniformMatrix4fv(eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(sphere.get_transform().get_transform_matrix()));
   // Set N matrix uniform
-	glUniformMatrix4fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(sphere.get_transform().get_normal_matrix()));
+	glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(sphere.get_transform().get_normal_matrix()));
   // Set eye_pos value
-	glUniformMatrix4fv(eff.get_uniform_location("eye_pos"), 1, GL_FALSE, value_ptr(cam.get_position()));
+	glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
   // Bind cubemap to TU 0
-	renderer::bind(cube_map, 0);
+	renderer::bind(cube_map, 0);	// LINE OF ERROR
   // Set cubemap uniform
 	glUniform1i(eff.get_uniform_location("cubemap"), 0);
   // Render mesh
