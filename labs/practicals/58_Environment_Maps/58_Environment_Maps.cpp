@@ -92,7 +92,7 @@ bool render() {
   // Set eye_pos value
 	glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cam.get_position()));
   // Bind cubemap to TU 0
-	renderer::bind(cube_map, 0);	// LINE OF ERROR
+	renderer::bind(cube_map, 0);
   // Set cubemap uniform
 	glUniform1i(eff.get_uniform_location("cubemap"), 0);
   // Render mesh
