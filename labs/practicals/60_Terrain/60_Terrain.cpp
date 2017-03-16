@@ -44,7 +44,7 @@ void generate_terrain(geometry &geom, const texture &height_map, unsigned int wi
     for (int z = 0; z < height_map.get_height(); ++z) {
       // *********************************
       // Calculate z position of point
-		point.z = -(depth / 2) + (depth_point * z);
+		point.z = -(depth / 2.0f) + (depth_point * static_cast<float>(z));
       // *********************************
       // Y position based on red component of height map data
       point.y = data[(z * height_map.get_width()) + x].y * height_scale;
@@ -92,7 +92,7 @@ void generate_terrain(geometry &geom, const texture &height_map, unsigned int wi
 
     // Normal is normal(cross product) of these two sides
     // *********************************
-	vec3 n = cross(side2, side1);
+	vec3 n = normalize(cross(side2, side1));
     // Add to normals in the normal buffer using the indices for the triangle
 	normals[idx1] = normals[idx1] + n;
 	normals[idx2] = normals[idx2] + n;
@@ -129,7 +129,7 @@ void generate_terrain(geometry &geom, const texture &height_map, unsigned int wi
       // Divide weight by sum
 	  vec4 w = tex_weight / texSum;
       // Add tex weight to weights
-	  tex_weight = tex_weight + w;
+	  tex_weights.push_back(tex_weight);
       // *********************************
     }
   }
@@ -138,7 +138,7 @@ void generate_terrain(geometry &geom, const texture &height_map, unsigned int wi
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
   geom.add_buffer(normals, BUFFER_INDEXES::NORMAL_BUFFER);
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
-  geom.add_buffer(tex_weights, BUFFER_INDEXES::TEXTURE_COORDS_1);
+  geom.add_buffer(tex_weights, BUFFER_INDEXES::TEXTURE_COORDS_1); // LINE OF ERROR
   geom.add_index_buffer(indices);
 
   // Delete data
