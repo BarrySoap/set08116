@@ -78,9 +78,9 @@ bool load_content() {
   glGenBuffers(2, particle_buffers_vbo);
   // *********************************
   // Place initial particle data in buffer 1
-  
+  for (unsigned int i = 0; i < MAX_PARTICLES; ++i) {
 
-
+  }
   // Fill space with blank data in buffer 2
 
 
@@ -180,8 +180,8 @@ bool render() {
 
   // *********************************
   // Swap front and back buffers
-
-
+  front_buf = back_buf;
+  back_buf = (back_buf + 1) % 2;
   // *********************************
   return true;
 }
