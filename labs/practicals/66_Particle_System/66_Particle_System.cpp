@@ -78,7 +78,7 @@ bool load_content() {
   glGenBuffers(2, particle_buffers_vbo);
   // *********************************
   // Place initial particle data in buffer 1
-
+  
 
 
   // Fill space with blank data in buffer 2
@@ -86,10 +86,10 @@ bool load_content() {
 
 
   // generate our feedback objects
-
+  glGenTransformFeedbacks(2, &particle_buffers_vbo[1]);
   // link fb[0] to vbo[1]
-
-
+  glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, transform_feedbacks[0]);
+  glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, particle_buffers_vbo[1]);
   // *********************************
   // link fb[1] to vbo[0]
   glBindTransformFeedback(GL_TRANSFORM_FEEDBACK, transform_feedbacks[1]);
