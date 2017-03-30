@@ -208,9 +208,9 @@ bool render() {
   // Set the tex uniform, 0
   glUniform1i(tex_eff.get_uniform_location("tex"), 0);
   // Bind alpha texture to TU, 1
-  glUniform1i(tex_eff.get_uniform_location("alpha_map"), 1);
+  renderer::bind(alpha_map, 1);
   // Set the tex uniform, 1
-  glUniform1i(tex_eff.get_uniform_location("tex"), 1);		// ?????????????????
+  glUniform1i(tex_eff.get_uniform_location("alpha_map"), 1);
   // Render the screen quad
   renderer::render(screen_quad);
   // *********************************
