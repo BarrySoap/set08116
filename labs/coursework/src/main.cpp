@@ -163,7 +163,7 @@ bool load_content() {
   /****************************************************************/
 
   // Build Effect
-  eff.build();
+  eff.build();		// LINE OF ERROR
 
   // ***** Set Free Camera (Default) Properties *****
   cameras[1]->set_position(vec3(0.0f, 10.0f, 400.0f));
