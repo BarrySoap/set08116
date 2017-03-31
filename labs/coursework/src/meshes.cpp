@@ -123,4 +123,8 @@ void Meshes() {
 	meshes["TorusD"].get_transform().scale = vec3(5.0f);
 	meshes["TorusD"].get_transform().position = vec3(-70.0f, 5.0f, -80.0f);
 	//************************************************************************//
+
+	meshes["Cog"] = mesh(geometry("models/cog.obj"));
+	meshes["Cog"].get_transform().scale = vec3(2000.0f);
+	meshes["Cog"].get_transform().position = vec3(0.0f, 400.0f, 0.0f);
 }
