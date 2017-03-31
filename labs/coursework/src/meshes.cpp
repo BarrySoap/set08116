@@ -69,23 +69,23 @@ void Meshes() {
 	//**********************************************************************************//
 
 	// ***** Create Front Pillars *****
-	meshes["PillarFront"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
-	meshes["PillarFrontB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarFront"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 55.0f, 5.0f)));
+	meshes["PillarFrontB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 55.0f, 5.0f)));
 	// ***** Move and Scale *****
 	meshes["PillarFront"].get_transform().scale = vec3(5.0f);
-	meshes["PillarFront"].get_transform().position = vec3(137.5f, 100.0f, 190.0f);
+	meshes["PillarFront"].get_transform().position = vec3(137.5f, 75.0f, 190.0f);
 	meshes["PillarFrontB"].get_transform().scale = vec3(5.0f);
-	meshes["PillarFrontB"].get_transform().position = vec3(-137.5f, 100.0f, 190.0f);
+	meshes["PillarFrontB"].get_transform().position = vec3(-137.5f, 75.0f, 190.0f);
 	//**********************************************************************************//
 
 	// ***** Create Back Pillars *****
-	meshes["PillarBack"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
-	meshes["PillarBackB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 40.0f, 5.0f)));
+	meshes["PillarBack"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 55.0f, 5.0f)));
+	meshes["PillarBackB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(5.0f, 55.0f, 5.0f)));
 	// ***** Move and Scale *****
 	meshes["PillarBack"].get_transform().scale = vec3(5.0f);
-	meshes["PillarBack"].get_transform().position = vec3(137.5f, 100.0f, -190.0f);
+	meshes["PillarBack"].get_transform().position = vec3(137.5f, 75.0f, -190.0f);
 	meshes["PillarBackB"].get_transform().scale = vec3(5.0f);
-	meshes["PillarBackB"].get_transform().position = vec3(-137.5f, 100.0f, -190.0f);
+	meshes["PillarBackB"].get_transform().position = vec3(-137.5f, 75.0f, -190.0f);
 	//**********************************************************************************//
 
 	// ***** Create Stands *****
@@ -124,7 +124,14 @@ void Meshes() {
 	meshes["TorusD"].get_transform().position = vec3(-70.0f, 5.0f, -80.0f);
 	//************************************************************************//
 
+	// ***** Create Cog *****
 	meshes["Cog"] = mesh(geometry("models/cog.obj"));
 	meshes["Cog"].get_transform().scale = vec3(2000.0f);
 	meshes["Cog"].get_transform().position = vec3(0.0f, 400.0f, 0.0f);
+	//************************************************************************//
+
+	/***** Create Box Underneath Building *****/
+	meshes["WallFoundation"] = mesh(geometry_builder::create_box(vec3(250.0f, 61.0f, 400.0f)));
+	meshes["WallFoundation"].get_transform().position = vec3(0.0f, -30.6f, 0.0f);
+	//************************************************************************//
 }

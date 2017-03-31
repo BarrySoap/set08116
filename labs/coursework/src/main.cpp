@@ -52,9 +52,9 @@ bool load_content() {
 	Meshes();
 
 	texture height_map("textures/heightmap.jpg");
-	generate_terrain(geom, height_map, 3000, 3000, 500.0f);
+	generate_terrain(geom, height_map, 8000, 8000, 900.0f);
 	terr = mesh(geom);
-	terr.get_transform().translate(vec3(0.0f, -300.0f, -600.0f));
+	terr.get_transform().translate(vec3(1200.0f, -300.0f, 200.0f));
 
 	// ***** Create Skybox Mesh *****
 	skybox = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
@@ -119,9 +119,9 @@ bool load_content() {
 	meshes["TorusG"].set_material(mat);
 	meshes["TorusH"].set_material(mat);
 
-	terr.get_material().set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
+	terr.get_material().set_diffuse(vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	terr.get_material().set_specular(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	terr.get_material().set_shininess(20.0f);
+	terr.get_material().set_shininess(1.0f);
 	terr.get_material().set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	/*********************************************/
 
@@ -134,7 +134,7 @@ bool load_content() {
 	texs["Torus"] = texture("textures/Torus.jpg", true, true);
 	texs["Carpet"] = texture("textures/Carpet.jpg", true, true);
 	texs["Cog"] = texture("textures/cog.jpg", true, true);
-	terrainTexs[0] = texture("textures/sand.jpg");
+	//terrainTexs[0] = texture("textures/sand.jpg");
 	terrainTexs[1] = texture("textures/grass.jpg");
 	terrainTexs[2] = texture("textures/stone.jpg");
 	terrainTexs[3] = texture("textures/snow.jpg");
@@ -194,9 +194,9 @@ bool load_content() {
   eff.build();
 
   // ***** Set Free Camera (Default) Properties *****
-  cameras[1]->set_position(vec3(0.0f, 10.0f, 400.0f));
+  cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
-  cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 2500.0f);
+  cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 5000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
   /*****************************************************************************************************************/
 
@@ -206,7 +206,7 @@ bool load_content() {
 
 bool update(float delta_time) {
 	
-	//cout << 1.0f / delta_time << endl;
+	cout << 1.0f / delta_time << endl;
 	static float range = 70.0f;
 
 	// ***** Rotate the torus' along the y axis *****
@@ -226,7 +226,6 @@ bool update(float delta_time) {
 	temp += delta_time;
 	if (temp < 1.0f) {
 		meshes["Cog"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time * 1.0f);
-		cout << temp << endl;
 	}
 	else if (temp > 2.0f) {
 		temp = 0.0f;
@@ -450,8 +449,8 @@ bool render() {
 	glUniform3fv(terrain_eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 	renderer::bind(terr.get_material(), "mat");
 
-	renderer::bind(terrainTexs[0], 0);
-	glUniform1i(eff.get_uniform_location("tex[0]"), 0);
+	//renderer::bind(terrainTexs[0], 0);
+	//glUniform1i(eff.get_uniform_location("tex[0]"), 0);
 	
 	renderer::bind(terrainTexs[1], 1);
 	glUniform1i(eff.get_uniform_location("tex[1]"), 1);
