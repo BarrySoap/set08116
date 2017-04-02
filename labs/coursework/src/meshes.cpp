@@ -134,4 +134,12 @@ void Meshes() {
 	meshes["WallFoundation"] = mesh(geometry_builder::create_box(vec3(250.0f, 61.0f, 400.0f)));
 	meshes["WallFoundation"].get_transform().position = vec3(0.0f, -30.6f, 0.0f);
 	//************************************************************************//
+
+	meshes["DroneBase"] = mesh(geometry_builder::create_sphere(10, 10, vec3(20.0f, 20.0f, 20.0f)));
+	meshes["DroneTop"] = mesh(geometry_builder::create_cylinder(10, 10, vec3(5.0f, 10.0f, 5.0f)));
+	meshes["Light"] = mesh(geometry_builder::create_sphere(10, 10, vec3(5.0f, 5.0f, 5.0f)));
+
+	meshes["DroneBase"].get_transform().position = vec3(0.0f, 400.0f, 0.0f);
+	meshes["DroneTop"].get_transform().position = vec3(0.0f, 423.0f, 0.0f);
+	meshes["Light"].get_transform().position = vec3(0.0f, 428.0f, 0.0f);
 }

@@ -134,6 +134,8 @@ bool load_content() {
 	texs["Torus"] = texture("textures/Torus.jpg", true, true);
 	texs["Carpet"] = texture("textures/Carpet.jpg", true, true);
 	texs["Cog"] = texture("textures/cog.jpg", true, true);
+	texs["Drone"] = texture("textures/Drone.png", true, true);
+	texs["Light"] = texture("textures/light.png", true, true);
 	//terrainTexs[0] = texture("textures/sand.jpg");
 	terrainTexs[1] = texture("textures/grass.jpg");
 	terrainTexs[2] = texture("textures/stone.jpg");
@@ -194,7 +196,8 @@ bool load_content() {
   eff.build();
 
   // ***** Set Free Camera (Default) Properties *****
-  cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
+  //cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
+  cameras[1]->set_position(meshes["DroneBase"].get_transform().position);
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
   cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 5000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
@@ -206,8 +209,21 @@ bool load_content() {
 
 bool update(float delta_time) {
 	
+	/***** Drone Movement *****/
+	float randomVecX = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
+	float randomVecY = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
+	float randomVecZ = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
+	vec3 DroneMovement(randomVecX, randomVecY, randomVecZ);
+	cout << randomVecX << endl;
+	
+	meshes["DroneBase"].get_transform().position += DroneMovement;
+	meshes["DroneTop"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 3.0f, 0.0f);
+	meshes["Light"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 8.0f, 0.0f);
+	/******************************************************************************************************************/
+
+	/***** FPS *****/
 	cout << 1.0f / delta_time << endl;
-	static float range = 70.0f;
+	/********************************/
 
 	// ***** Rotate the torus' along the y axis *****
 	meshes["Torus"].get_transform().rotate(vec3(0.0f, half_pi<float>(), 0.0f) * delta_time);
@@ -246,6 +262,8 @@ bool update(float delta_time) {
 		spotLight.move(vec3(20.0f, 0.0f, 0.0f) * delta_time);
 	}
 	/*******************************************************/
+
+	static float range = 70.0f;
 
 	// ***** Spot Light Intensity *****
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_O)) {
@@ -407,6 +425,12 @@ texture BindingHelper(string name) {
 	}
 	else if (name.substr(0, 3).compare("Cog") == 0) {
 		return texs["Cog"];
+	}
+	else if (name.substr(0, 5).compare("Drone") == 0) {
+		return texs["Drone"];
+	}
+	else if (name.substr(0, 5).compare("Light") == 0) {
+		return texs["Light"];
 	}
 	else {
 		return texs[name];
