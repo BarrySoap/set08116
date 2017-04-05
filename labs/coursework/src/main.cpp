@@ -143,8 +143,8 @@ bool load_content() {
 
 	normalMap = texture("textures/RoofNormalMap.jpg", true, true);
 	blankNormal = texture("textures/BlankNormal.jpg", true, true);
-	array<string, 6> filenames = { "textures/sahara_ft.jpg", "textures/sahara_bk.jpg", "textures/sahara_up.jpg",
-		"textures/sahara_dn.jpg", "textures/sahara_rt.jpg", "textures/sahara_lf.jpg" };
+	array<string, 6> filenames = { "textures/alps_ft.tga", "textures/alps_bk.tga", "textures/alps_up.tga",
+		"textures/alps_dn.tga", "textures/alps_rt.tga", "textures/alps_lf.tga" };
 	/*************************************************************/
 
 	// ***** Set Light Attributes *****
@@ -210,19 +210,20 @@ bool load_content() {
 bool update(float delta_time) {
 	
 	/***** Drone Movement *****/
-	float randomVecX = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
-	float randomVecY = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
-	float randomVecZ = ((float)rand()) / RAND_MAX * 20.0 - 10.0;
-	vec3 DroneMovement(randomVecX, randomVecY, randomVecZ);
-	cout << randomVecX << endl;
+	static vec3 moveX(1.0f, 0.0f, 0.0f);
+	static float tricky = 1;
+	vec3 meh(rand() % 90 + 30);
+	tricky += 0.1f * delta_time;
 	
-	meshes["DroneBase"].get_transform().position += DroneMovement;
-	meshes["DroneTop"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 3.0f, 0.0f);
-	meshes["Light"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 8.0f, 0.0f);
+	meshes["DroneBase"].get_transform().translate(vec3(sinf(tricky), 0.0f, cos(tricky)) * 3.0f);
+	meshes["DroneBase"].get_transform().rotate(meh);
+
+	meshes["DroneTop"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 23.0f, 0.0f);
+	meshes["Light"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 28.0f, 0.0f);
 	/******************************************************************************************************************/
 
 	/***** FPS *****/
-	cout << 1.0f / delta_time << endl;
+	//cout << 1.0f / delta_time << endl;
 	/********************************/
 
 	// ***** Rotate the torus' along the y axis *****
@@ -517,16 +518,15 @@ bool render() {
 		renderer::bind(pointLights, "points");
 		renderer::bind(directLight, "direct");
 
-		glUniform1i(eff.get_uniform_location("blankNormal"), 1);
+		renderer::bind(blankNormal, 1);
 		if (e.first == "Roof") {
 			renderer::bind(normalMap, 1);
 		}
 
 		renderer::bind(BindingHelper(e.first), 0);
-		renderer::bind(normalMap, 1);
 		
 		glUniform1i(eff.get_uniform_location("tex"), 0);
-		glUniform1i(eff.get_uniform_location("normalMap"), 2);
+		glUniform1i(eff.get_uniform_location("normal_map"), 1);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
 		// Render geometry
