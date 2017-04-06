@@ -4,26 +4,25 @@
 #include "meshes.h"
 #include "terrain.h"
 
+#define FOG_LINEAR 0
+#define FOG_EXP 1
+#define FOG_EXP2 2
+
 using namespace std;
 using namespace graphics_framework;
 using namespace glm;
 
 map<string, mesh> meshes;
 map<mesh*, mesh*> transformed_hierarchy;
-mesh skybox;
-mesh terr;
+mesh skybox, terr;
 geometry geom;
-effect eff;
-effect sky_eff;
-effect terrain_eff;
+effect eff, sky_eff, terrain_eff;
 map<string, texture> texs;
 texture terrainTexs[4];
-texture modelTex;
 array<camera*, 2> cameras;
 uint cameraType = 1;
 uint targetCam = 1;
-texture normalMap;
-texture blankNormal;
+texture normalMap, blankNormal, modelTex;
 material mat;
 cubemap cube_map;
 spot_light spotLight;
@@ -32,6 +31,7 @@ directional_light directLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
+int fog = 0;
 
 bool initialise() {
 	// ***** Set up Free/Target Cameras *****
@@ -196,8 +196,7 @@ bool load_content() {
   eff.build();
 
   // ***** Set Free Camera (Default) Properties *****
-  //cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
-  cameras[1]->set_position(meshes["DroneBase"].get_transform().position);
+  cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
   cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 5000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
@@ -210,13 +209,12 @@ bool load_content() {
 bool update(float delta_time) {
 	
 	/***** Drone Movement *****/
-	static vec3 moveX(1.0f, 0.0f, 0.0f);
-	static float tricky = 1;
-	vec3 meh(rand() % 90 + 30);
-	tricky += 0.1f * delta_time;
+	static float droneMovement = 1;
+	vec3 rotation(rand() % 90 + 30);
+	droneMovement += 0.1f * delta_time;
 	
-	meshes["DroneBase"].get_transform().translate(vec3(sinf(tricky), 0.0f, cos(tricky)) * 3.0f);
-	meshes["DroneBase"].get_transform().rotate(meh);
+	meshes["DroneBase"].get_transform().translate(vec3(sinf(droneMovement), 0.0f, cos(droneMovement)) * 3.0f);
+	meshes["DroneBase"].get_transform().rotate(rotation);
 
 	meshes["DroneTop"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 23.0f, 0.0f);
 	meshes["Light"].get_transform().position = meshes["DroneBase"].get_transform().position + vec3(0.0f, 28.0f, 0.0f);
