@@ -4,10 +4,6 @@
 #include "meshes.h"
 #include "terrain.h"
 
-#define FOG_LINEAR 0
-#define FOG_EXP 1
-#define FOG_EXP2 2
-
 using namespace std;
 using namespace graphics_framework;
 using namespace glm;
@@ -169,6 +165,8 @@ bool load_content() {
 	directLight.set_ambient_intensity(vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	directLight.set_direction(normalize(vec3(0.0f, 1.0f, 0.0f)));
 	directLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	renderer::setClearColour(0.5f, 0.5f, 0.5f);
 	/******************************************************/
 
 	// ***** Create cube map *****
@@ -177,7 +175,8 @@ bool load_content() {
 
   // ***** Load In Shaders *****
   eff.add_shader("shaders/main.vert", GL_VERTEX_SHADER);
-  vector<string> frag_shaders{ "shaders/main.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag"};
+  vector<string> frag_shaders{ "shaders/main.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag", 
+							   "shaders/part_direction.frag", "shaders/part_fog.frag"};
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
 
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
@@ -187,6 +186,7 @@ bool load_content() {
   terrain_eff.add_shader("shaders/terrain.vert", GL_VERTEX_SHADER);
   terrain_eff.add_shader("shaders/terrain.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_direction.frag", GL_FRAGMENT_SHADER);
+  terrain_eff.add_shader("shaders/part_fog.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_weighted_texture_4.frag", GL_FRAGMENT_SHADER);
   // Build effect
   terrain_eff.build();
@@ -207,6 +207,18 @@ bool load_content() {
 
 
 bool update(float delta_time) {
+
+	/***** Fog Control *****/
+	if (glfwGetKey(renderer::get_window(), '5')) {
+		fog = 0;
+	}
+	if (glfwGetKey(renderer::get_window(), '6')) {
+		fog = 1;
+	}
+	if (glfwGetKey(renderer::get_window(), '7')) {
+		fog = 2;
+	}
+	/*********************************************/
 	
 	/***** Drone Movement *****/
 	static float droneMovement = 1;
@@ -467,9 +479,16 @@ bool render() {
 	auto PT = cameras[cameraType]->get_projection();
 	auto MVPT = PT * VT * MT;
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVPT));
+	auto MVT = VT * MT;
+	glUniformMatrix4fv(terrain_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(MVT));
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(MT));
 	glUniformMatrix3fv(terrain_eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(terr.get_transform().get_normal_matrix()));
 	glUniform3fv(terrain_eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
+	glUniform4fv(terrain_eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
+	glUniform1f(terrain_eff.get_uniform_location("fog_start"), 5.0f);
+	glUniform1f(terrain_eff.get_uniform_location("fog_end"), 100.0f);
+	glUniform1f(terrain_eff.get_uniform_location("fog_density"), 0.04f);
+	glUniform1i(terrain_eff.get_uniform_location("fog_type"), fog);
 	renderer::bind(terr.get_material(), "mat");
 
 	//renderer::bind(terrainTexs[0], 0);
@@ -509,6 +528,8 @@ bool render() {
 		auto MVP = P * V * M;
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+		auto MV = V * M;
+		glUniformMatrix4fv(eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(MV));
 		glUniformMatrix4fv(eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(M));
 		glUniformMatrix3fv(eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(m.get_transform().get_normal_matrix()));
 		renderer::bind(m.get_material(), "mat");
@@ -526,6 +547,12 @@ bool render() {
 		glUniform1i(eff.get_uniform_location("tex"), 0);
 		glUniform1i(eff.get_uniform_location("normal_map"), 1);
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
+
+		glUniform4fv(eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
+		glUniform1f(eff.get_uniform_location("fog_start"), 5.0f);
+		glUniform1f(eff.get_uniform_location("fog_end"), 100.0f);
+		glUniform1f(eff.get_uniform_location("fog_density"), 0.04f);
+		glUniform1i(eff.get_uniform_location("fog_type"), fog);
 
 		// Render geometry
 		renderer::render(m);

@@ -2,6 +2,7 @@
 
 // MVP transformation matrix
 uniform mat4 MVP;
+uniform mat4 MV;
 // M transformation matrix
 uniform mat4 M;
 // N transformation matrix
@@ -24,12 +25,14 @@ layout(location = 1) out vec3 transformed_normal;
 layout(location = 2) out vec2 vertex_tex_coord;
 // Outgoing tex_weight
 layout(location = 3) out vec4 vertex_tex_weight;
+layout(location = 4) out vec4 CS_position;
 
 void main() {
   // Calculate screen position
   gl_Position = MVP * vec4(position, 1.0);
   // Calculate vertex world position
   vertex_position = (M * vec4(position, 1.0)).xyz;
+  CS_position = MV * vec4(position, 1.0);
   // Transform normal
   transformed_normal = N * normal;
   // Pass through tex_coord

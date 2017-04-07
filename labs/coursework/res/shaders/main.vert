@@ -2,6 +2,7 @@
 
 // Model transformation matrix
 uniform mat4 M;
+uniform mat4 MV;
 uniform mat4 MVP;
 uniform mat4 MVPS;
 uniform mat3 N;
@@ -18,11 +19,13 @@ layout(location = 2) out vec3 transformed_binormal;
 layout(location = 3) out vec3 transformed_tangent;
 layout(location = 4) out vec2 tex_coord_out;
 layout(location = 5) out vec4 light_pos;
+layout(location = 6) out vec4 CS_position;
 
 void main() {
   gl_Position = MVP * vec4(position, 1.0f);
 
   vertex_position = (M * vec4(position, 1.0f)).xyz;
+  CS_position = MV * vec4(position, 1.0);
   light_pos = MVPS * vec4(position, 1.0);
   transformed_normal = N * normal;
   transformed_binormal = normalize(N * binormal);
