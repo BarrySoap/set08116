@@ -3,6 +3,7 @@
 #include "main.h"
 #include "meshes.h"
 #include "terrain.h"
+#include "lightsAndMaterials.h"
 
 using namespace std;
 using namespace graphics_framework;
@@ -10,9 +11,9 @@ using namespace glm;
 
 map<string, mesh> meshes;
 map<mesh*, mesh*> transformed_hierarchy;
-mesh skybox, terr;
+mesh skybox, terr, sphere;
 geometry geom;
-effect eff, sky_eff, terrain_eff;
+effect eff, sky_eff, terrain_eff, explode_eff;
 map<string, texture> texs;
 texture terrainTexs[4];
 array<camera*, 2> cameras;
@@ -27,7 +28,8 @@ directional_light directLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
-int fog = 0;
+int fog = 2;
+float explode_factor = 0.0f;
 
 bool initialise() {
 	// ***** Set up Free/Target Cameras *****
@@ -45,7 +47,13 @@ bool initialise() {
 
 bool load_content() {
 
+	/***** Create All Meshes using meshes.cpp *****/
 	Meshes();
+
+	sphere = mesh(geometry_builder::create_sphere(100, 100));
+	sphere.get_transform().position = vec3(0.0f, 400.0f, 0.0f);
+	sphere.get_transform().scale = (vec3(50.0f));
+	/**********************************************/
 
 	texture height_map("textures/heightmap.jpg");
 	generate_terrain(geom, height_map, 8000, 8000, 900.0f);
@@ -71,55 +79,9 @@ bool load_content() {
 	meshes["TorusH"].get_transform().position = vec3(0.0f, 17.5f, 0.0f);
 	/******************************************************************/
 
-	// ***** Set Material Attributes *****
-	mat.set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	mat.set_specular(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	mat.set_shininess(25.0f);
-	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-	meshes["Floor"].set_material(mat);
-	meshes["FloorB"].set_material(mat);
-	meshes["WallFrontA"].set_material(mat);
-	meshes["WallFrontB"].set_material(mat);
-	meshes["WallFrontAB"].set_material(mat);
-	meshes["WallRight"].set_material(mat);
-	meshes["WallLeft"].set_material(mat);
-	meshes["WallRight"].set_material(mat);
-	meshes["WallTop"].set_material(mat);
-	meshes["WallBack"].set_material(mat);
-	meshes["Roof"].set_material(mat);
-
-	mat.set_specular(vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	mat.set_diffuse(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	meshes["Carpet"].set_material(mat);
-
-	mat.set_specular(vec4(0.8f, 0.8f, 0.8f, 1.0f));
-	mat.set_diffuse(vec4(0.5f, 0.5f, 0.5f, 1.0f));
-	meshes["PillarFront"].set_material(mat);
-	meshes["PillarFrontB"].set_material(mat);
-	meshes["PillarBack"].set_material(mat);
-	meshes["PillarBackB"].set_material(mat);
-	meshes["Stand"].set_material(mat);
-	meshes["StandB"].set_material(mat);
-	meshes["StandC"].set_material(mat);
-	meshes["StandD"].set_material(mat);
-
-	mat.set_specular(vec4(0.3f, 0.3f, 0.3f, 1.0f));
-	mat.set_diffuse(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	meshes["Torus"].set_material(mat);
-	meshes["TorusB"].set_material(mat);
-	meshes["TorusC"].set_material(mat);
-	meshes["TorusD"].set_material(mat);
-	meshes["TorusE"].set_material(mat);
-	meshes["TorusF"].set_material(mat);
-	meshes["TorusG"].set_material(mat);
-	meshes["TorusH"].set_material(mat);
-
-	terr.get_material().set_diffuse(vec4(0.1f, 0.1f, 0.1f, 1.0f));
-	terr.get_material().set_specular(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	terr.get_material().set_shininess(1.0f);
-	terr.get_material().set_emissive(vec4(0.0f, 0.0f, 0.0f, 1.0f));
-	/*********************************************/
+	// ***** Set Material Attributes using lightsAndMaterials.cpp *****
+	SetMaterials();
+	/************************************/
 
 	// ***** Initialise Textures *****
 	texs["Wall"]  = texture("textures/InsideWall.jpg", true, true);
@@ -143,28 +105,8 @@ bool load_content() {
 		"textures/alps_dn.tga", "textures/alps_rt.tga", "textures/alps_lf.tga" };
 	/*************************************************************/
 
-	// ***** Set Light Attributes *****
-	spotLight.set_position(vec3(0.0f, 10.0f, 150.0f));
-	spotLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	spotLight.set_direction(normalize(vec3(0.0f, 0.0f, -1.0f)));
-	spotLight.set_range(20.0f);
-	spotLight.set_power(1.0f);
-
-	for (int i = 0; i < 6; ++i) {
-		pointLights[i].set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
-		pointLights[i].set_range(20.0f);
-	}
-
-	pointLights[0].set_position(vec3(0.0f, 270.0f, 0));
-	pointLights[1].set_position(vec3(137.5f, 270.0f, 190.0f));
-	pointLights[2].set_position(vec3(-137.5f, 270.0f, 190.0f));
-	pointLights[3].set_position(vec3(137.5f, 270.0f, -190.0f));
-	pointLights[4].set_position(vec3(-137.5f, 270.0f, -190.0f));
-	pointLights[5].set_position(vec3(0.0f, 20.0f, 250.0f));
-
-	directLight.set_ambient_intensity(vec4(0.1f, 0.1f, 0.1f, 1.0f));
-	directLight.set_direction(normalize(vec3(0.0f, 1.0f, 0.0f)));
-	directLight.set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	// ***** Set Light Attributes using lightsAndMaterials.cpp *****
+	SetLights();
 
 	renderer::setClearColour(0.5f, 0.5f, 0.5f);
 	/******************************************************/
@@ -178,6 +120,7 @@ bool load_content() {
   vector<string> frag_shaders{ "shaders/main.frag", "shaders/part_point.frag", "shaders/part_spot.frag", "shaders/part_normal.frag", 
 							   "shaders/part_direction.frag", "shaders/part_fog.frag"};
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
+  eff.build();
 
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
   sky_eff.add_shader("shaders/skybox.frag", GL_FRAGMENT_SHADER);
@@ -188,15 +131,17 @@ bool load_content() {
   terrain_eff.add_shader("shaders/part_direction.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_fog.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_weighted_texture_4.frag", GL_FRAGMENT_SHADER);
-  // Build effect
   terrain_eff.build();
+
+  explode_eff.add_shader("shaders/explode.vert", GL_VERTEX_SHADER);
+  explode_eff.add_shader("shaders/explode.frag", GL_FRAGMENT_SHADER);
+  explode_eff.add_shader("shaders/explode.geom", GL_GEOMETRY_SHADER);
+  explode_eff.build();
   /****************************************************************/
 
-  // Build Effect
-  eff.build();
-
   // ***** Set Free Camera (Default) Properties *****
-  cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
+  //cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
+  cameras[1]->set_position(sphere.get_transform().position);
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
   cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 5000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
@@ -219,6 +164,15 @@ bool update(float delta_time) {
 		fog = 2;
 	}
 	/*********************************************/
+
+	/***** Exploding Shape *****/
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_8)) {
+		explode_factor += 1.0f;
+	}
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_9)) {
+		explode_factor -= 1.0f;
+	}
+	/****************************************************/
 	
 	/***** Drone Movement *****/
 	static float droneMovement = 1;
@@ -415,8 +369,9 @@ bool update(float delta_time) {
 }
 
 texture BindingHelper(string name) {
-	// If the texture name contains the string 'Pillar'
+	// If the meshes name contains the string 'Pillar'
 	if (name.substr(0, 6).compare("Pillar") == 0) {
+		// return the texture name called "Pillar"
 		return texs["Pillar"];
 	}
 	else if (name.substr(0, 4).compare("Wall") == 0) {
@@ -449,6 +404,18 @@ texture BindingHelper(string name) {
 }
 
 bool render() {
+	// ***** Exploding Shape *****
+	renderer::bind(explode_eff);
+	auto ME = sphere.get_transform().get_transform_matrix();
+	auto VE = cameras[cameraType]->get_view();
+	auto PE = cameras[cameraType]->get_projection();
+	auto MVPE = PE * VE * ME;
+
+	glUniformMatrix4fv(explode_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVPE));
+	glUniform1f(explode_eff.get_uniform_location("explode_factor"), explode_factor);
+
+	renderer::render(sphere);
+
 	// ***** Skybox Stuff *****
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);

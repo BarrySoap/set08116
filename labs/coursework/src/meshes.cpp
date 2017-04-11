@@ -93,6 +93,7 @@ void Meshes() {
 	meshes["StandB"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
 	meshes["StandC"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
 	meshes["StandD"] = mesh(geometry_builder::create_cylinder(40, 40, vec3(2.0f, 20.0f, 2.0f)));
+	meshes["StandE"] = mesh(geometry_builder::create_box(vec3(10.0f, 10.0f, 10.0f)));
 	// ***** Move and Scale *****
 	meshes["Stand"].get_transform().scale = vec3(5.0f);
 	meshes["Stand"].get_transform().position = vec3(70.0f, 50.0f, 80.0f);
@@ -102,6 +103,7 @@ void Meshes() {
 	meshes["StandC"].get_transform().position = vec3(70.0f, 50.0f, -80.0f);
 	meshes["StandD"].get_transform().scale = vec3(5.0f);
 	meshes["StandD"].get_transform().position = vec3(-70.0f, 50.0f, -80.0f);
+	meshes["StandE"].get_transform().position = vec3(0.0f, 5.0f, 0.0f);
 	//*************************************************************************//
 
 	// ***** Create Torus' *****
@@ -127,7 +129,7 @@ void Meshes() {
 	// ***** Create Cog *****
 	meshes["Cog"] = mesh(geometry("models/cog.obj"));
 	meshes["Cog"].get_transform().scale = vec3(2000.0f);
-	meshes["Cog"].get_transform().position = vec3(0.0f, 400.0f, 0.0f);
+	meshes["Cog"].get_transform().position = vec3(0.0f, 210.0f, 0.0f);
 	//************************************************************************//
 
 	/***** Create Box Underneath Building *****/
