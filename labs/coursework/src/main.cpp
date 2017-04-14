@@ -125,6 +125,8 @@ bool load_content() {
 
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
   sky_eff.add_shader("shaders/skybox.frag", GL_FRAGMENT_SHADER);
+  sky_eff.add_shader("shaders/part_direction.frag", GL_FRAGMENT_SHADER);
+  sky_eff.add_shader("shaders/part_fog.frag", GL_FRAGMENT_SHADER);
   sky_eff.build();
 
   terrain_eff.add_shader("shaders/terrain.vert", GL_VERTEX_SHADER);
@@ -407,8 +409,20 @@ bool render() {
 	auto MVP = P * V * M;
 	
 	glUniformMatrix4fv(sky_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+	auto MVS = V * M;
+	glUniformMatrix4fv(sky_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(MVS));
+	glUniformMatrix4fv(sky_eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(M));
+	glUniformMatrix3fv(sky_eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(skybox.get_transform().get_normal_matrix()));
+	glUniform3fv(sky_eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
+	glUniform4fv(sky_eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
+	glUniform1f(sky_eff.get_uniform_location("fog_start"), 5.0f);
+	glUniform1f(sky_eff.get_uniform_location("fog_end"), 5.0f);
+	glUniform1f(sky_eff.get_uniform_location("fog_density"), 0.04f);
+	glUniform1i(sky_eff.get_uniform_location("fog_type"), fog);
 	
 	glUniform1i(sky_eff.get_uniform_location("cubemap"), 0);
+
+	renderer::bind(directLight, "light");
 
 	renderer::render(skybox);
 
