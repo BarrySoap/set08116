@@ -77,7 +77,7 @@ void main () {
 	vec3 view_dir = normalize(eye_pos - vertex_position);
 	vec4 tex_colour = texture(tex, tex_coord);
 	vec3 maybeNormal = normalMap(transformed_normal, transformed_binormal, transformed_tangent, normal_map, tex_coord);
-	colour = vec4(0.0f);
+	colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	for(int i = 0; i < 6; i++)
 	{
 		colour += calculate_point(points[i], mat, vertex_position, maybeNormal, view_dir, tex_colour);

@@ -13,7 +13,7 @@ map<string, mesh> meshes;
 map<mesh*, mesh*> transformed_hierarchy;
 mesh skybox, terr, sphere;
 geometry geom;
-effect eff, sky_eff, terrain_eff, explode_eff;
+effect eff, sky_eff, terrain_eff;
 map<string, texture> texs;
 texture terrainTexs[4];
 array<camera*, 2> cameras;
@@ -28,8 +28,7 @@ directional_light directLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
-int fog = 2;
-float explode_factor = 0.0f;
+int fog = 0;
 
 bool initialise() {
 	// ***** Set up Free/Target Cameras *****
@@ -55,10 +54,12 @@ bool load_content() {
 	sphere.get_transform().scale = (vec3(50.0f));
 	/**********************************************/
 
+	/***** Terrain Generation *****/
 	texture height_map("textures/heightmap.jpg");
 	generate_terrain(geom, height_map, 8000, 8000, 900.0f);
 	terr = mesh(geom);
 	terr.get_transform().translate(vec3(1200.0f, -300.0f, 200.0f));
+	/**************************************************************/
 
 	// ***** Create Skybox Mesh *****
 	skybox = mesh(geometry_builder::create_box(vec3(1.0f, 1.0f, 1.0f)));
@@ -94,15 +95,15 @@ bool load_content() {
 	texs["Cog"] = texture("textures/cog.jpg", true, true);
 	texs["Drone"] = texture("textures/Drone.png", true, true);
 	texs["Light"] = texture("textures/light.png", true, true);
-	//terrainTexs[0] = texture("textures/sand.jpg");
+	terrainTexs[0] = texture("textures/sand.jpg");
 	terrainTexs[1] = texture("textures/grass.jpg");
 	terrainTexs[2] = texture("textures/stone.jpg");
 	terrainTexs[3] = texture("textures/snow.jpg");
 
 	normalMap = texture("textures/RoofNormalMap.jpg", true, true);
 	blankNormal = texture("textures/BlankNormal.jpg", true, true);
-	array<string, 6> filenames = { "textures/alps_ft.tga", "textures/alps_bk.tga", "textures/alps_up.tga",
-		"textures/alps_dn.tga", "textures/alps_rt.tga", "textures/alps_lf.tga" };
+	array<string, 6> filenames = { "textures/emeraldfog_ft.tga", "textures/emeraldfog_bk.tga", "textures/emeraldfog_up.tga",
+		"textures/emeraldfog_dn.tga", "textures/emeraldfog_rt.tga", "textures/emeraldfog_lf.tga" };
 	/*************************************************************/
 
 	// ***** Set Light Attributes using lightsAndMaterials.cpp *****
@@ -132,16 +133,10 @@ bool load_content() {
   terrain_eff.add_shader("shaders/part_fog.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_weighted_texture_4.frag", GL_FRAGMENT_SHADER);
   terrain_eff.build();
-
-  explode_eff.add_shader("shaders/explode.vert", GL_VERTEX_SHADER);
-  explode_eff.add_shader("shaders/explode.frag", GL_FRAGMENT_SHADER);
-  explode_eff.add_shader("shaders/explode.geom", GL_GEOMETRY_SHADER);
-  explode_eff.build();
   /****************************************************************/
 
   // ***** Set Free Camera (Default) Properties *****
-  //cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
-  cameras[1]->set_position(sphere.get_transform().position);
+  cameras[1]->set_position(vec3(0.0f, 100.0f, 400.0f));
   cameras[1]->set_target(vec3(0.0f, 0.0f, 0.0f));
   cameras[1]->set_projection(quarter_pi<float>(), renderer::get_screen_aspect(), 0.1f, 5000.0f);
   auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
@@ -164,15 +159,6 @@ bool update(float delta_time) {
 		fog = 2;
 	}
 	/*********************************************/
-
-	/***** Exploding Shape *****/
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_8)) {
-		explode_factor += 1.0f;
-	}
-	if (glfwGetKey(renderer::get_window(), GLFW_KEY_9)) {
-		explode_factor -= 1.0f;
-	}
-	/****************************************************/
 	
 	/***** Drone Movement *****/
 	static float droneMovement = 1;
@@ -404,17 +390,11 @@ texture BindingHelper(string name) {
 }
 
 bool render() {
-	// ***** Exploding Shape *****
-	renderer::bind(explode_eff);
-	auto ME = sphere.get_transform().get_transform_matrix();
-	auto VE = cameras[cameraType]->get_view();
-	auto PE = cameras[cameraType]->get_projection();
-	auto MVPE = PE * VE * ME;
 
-	glUniformMatrix4fv(explode_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVPE));
-	glUniform1f(explode_eff.get_uniform_location("explode_factor"), explode_factor);
-
-	renderer::render(sphere);
+	/***** V & P can be used across multiple effects *****/
+	auto V = cameras[cameraType]->get_view();
+	auto P = cameras[cameraType]->get_projection();
+	/*****************************************************/
 
 	// ***** Skybox Stuff *****
 	glDisable(GL_DEPTH_TEST);
@@ -424,8 +404,6 @@ bool render() {
 	renderer::bind(sky_eff);
 	
 	auto M = skybox.get_transform().get_transform_matrix();
-	auto V = cameras[cameraType]->get_view();
-	auto P = cameras[cameraType]->get_projection();
 	auto MVP = P * V * M;
 	
 	glUniformMatrix4fv(sky_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
@@ -442,33 +420,31 @@ bool render() {
 	/***** Terrain Stuff *****/
 	renderer::bind(terrain_eff);
 	auto MT = terr.get_transform().get_transform_matrix();
-	auto VT = cameras[cameraType]->get_view();
-	auto PT = cameras[cameraType]->get_projection();
-	auto MVPT = PT * VT * MT;
+	auto MVPT = P * V * MT;
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVPT));
-	auto MVT = VT * MT;
+	auto MVT = V * MT;
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(MVT));
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(MT));
 	glUniformMatrix3fv(terrain_eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(terr.get_transform().get_normal_matrix()));
 	glUniform3fv(terrain_eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 	glUniform4fv(terrain_eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
-	glUniform1f(terrain_eff.get_uniform_location("fog_start"), 5.0f);
-	glUniform1f(terrain_eff.get_uniform_location("fog_end"), 100.0f);
+	glUniform1f(terrain_eff.get_uniform_location("fog_start"), 10.0f);
+	glUniform1f(terrain_eff.get_uniform_location("fog_end"), 500.0f);
 	glUniform1f(terrain_eff.get_uniform_location("fog_density"), 0.04f);
 	glUniform1i(terrain_eff.get_uniform_location("fog_type"), fog);
 	renderer::bind(terr.get_material(), "mat");
 
-	//renderer::bind(terrainTexs[0], 0);
-	//glUniform1i(eff.get_uniform_location("tex[0]"), 0);
+	renderer::bind(terrainTexs[0], 0);
+	glUniform1i(terrain_eff.get_uniform_location("tex[0]"), 0);
 	
 	renderer::bind(terrainTexs[1], 1);
-	glUniform1i(eff.get_uniform_location("tex[1]"), 1);
+	glUniform1i(terrain_eff.get_uniform_location("tex[1]"), 1);
 	
 	renderer::bind(terrainTexs[2], 2);
-	glUniform1i(eff.get_uniform_location("tex[2]"), 2);
+	glUniform1i(terrain_eff.get_uniform_location("tex[2]"), 2);
 	
 	renderer::bind(terrainTexs[3], 3);
-	glUniform1i(eff.get_uniform_location("tex[3]"), 3);
+	glUniform1i(terrain_eff.get_uniform_location("tex[3]"), 3);
 
 	renderer::bind(directLight, "light");
 
@@ -490,8 +466,6 @@ bool render() {
 		else {
 			M = m.get_transform().get_transform_matrix();
 		}
-		auto V = cameras[cameraType]->get_view();
-		auto P = cameras[cameraType]->get_projection();
 		auto MVP = P * V * M;
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
@@ -516,8 +490,8 @@ bool render() {
 		glUniform3fv(eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 
 		glUniform4fv(eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
-		glUniform1f(eff.get_uniform_location("fog_start"), 5.0f);
-		glUniform1f(eff.get_uniform_location("fog_end"), 100.0f);
+		glUniform1f(eff.get_uniform_location("fog_start"), 10.0f);
+		glUniform1f(eff.get_uniform_location("fog_end"), 500.0f);
 		glUniform1f(eff.get_uniform_location("fog_density"), 0.04f);
 		glUniform1i(eff.get_uniform_location("fog_type"), fog);
 
