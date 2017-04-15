@@ -64,7 +64,7 @@ void SetLights() {
 	spotLight.set_range(20.0f);
 	spotLight.set_power(1.0f);
 
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < 7; ++i) {
 		pointLights[i].set_light_colour(vec4(1.0f, 1.0f, 1.0f, 1.0f));
 		pointLights[i].set_range(20.0f);
 	}
@@ -75,6 +75,7 @@ void SetLights() {
 	pointLights[3].set_position(vec3(137.5f, 270.0f, -190.0f));
 	pointLights[4].set_position(vec3(-137.5f, 270.0f, -190.0f));
 	pointLights[5].set_position(vec3(0.0f, 20.0f, 250.0f));
+	pointLights[6].set_position(vec3(1250.0f, 25.0f, 1250.0f));
 
 	directLight.set_ambient_intensity(vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	directLight.set_direction(normalize(vec3(0.0f, 1.0f, 0.0f)));

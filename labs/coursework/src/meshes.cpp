@@ -103,7 +103,8 @@ void Meshes() {
 	meshes["StandC"].get_transform().position = vec3(70.0f, 50.0f, -80.0f);
 	meshes["StandD"].get_transform().scale = vec3(5.0f);
 	meshes["StandD"].get_transform().position = vec3(-70.0f, 50.0f, -80.0f);
-	meshes["StandE"].get_transform().position = vec3(0.0f, 5.0f, 0.0f);
+	meshes["StandE"].get_transform().scale = vec3(5.0f);
+	meshes["StandE"].get_transform().position = vec3(1250.0f, -12.5f, 1250.0f);
 	//*************************************************************************//
 
 	// ***** Create Torus' *****

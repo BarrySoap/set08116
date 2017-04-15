@@ -23,12 +23,12 @@ texture normalMap, blankNormal, modelTex;
 material mat;
 cubemap cube_map;
 spot_light spotLight;
-vector<point_light> pointLights(6);
+vector<point_light> pointLights(7);
 directional_light directLight;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
-int fog = 0;
+int fog = 2;
 
 bool initialise() {
 	// ***** Set up Free/Target Cameras *****

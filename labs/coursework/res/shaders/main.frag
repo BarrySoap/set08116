@@ -52,7 +52,7 @@ float calculate_fog(in float fog_coord, in vec4 fog_colour, in float fog_start, 
 uniform sampler2D tex;
 uniform sampler2D normal_map;
 uniform vec3 eye_pos;
-uniform point_light points[5];
+uniform point_light points[7];
 uniform spot_light spot;
 uniform directional_light direction;
 uniform material mat;
@@ -78,7 +78,7 @@ void main () {
 	vec4 tex_colour = texture(tex, tex_coord);
 	vec3 maybeNormal = normalMap(transformed_normal, transformed_binormal, transformed_tangent, normal_map, tex_coord);
 	colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-	for(int i = 0; i < 6; i++)
+	for(int i = 0; i < 7; i++)
 	{
 		colour += calculate_point(points[i], mat, vertex_position, maybeNormal, view_dir, tex_colour);
 	}
