@@ -11,9 +11,10 @@ using namespace glm;
 
 map<string, mesh> meshes;
 map<mesh*, mesh*> transformed_hierarchy;
-mesh skybox, terr, sphere;
+mesh skybox, terr;
 geometry geom;
-effect eff, sky_eff, terrain_eff;
+geometry screen_quad;
+effect eff, simple_eff, sky_eff, terrain_eff, normals_eff, billboard_eff;
 map<string, texture> texs;
 texture terrainTexs[4];
 array<camera*, 2> cameras;
@@ -25,6 +26,7 @@ cubemap cube_map;
 spot_light spotLight;
 vector<point_light> pointLights(7);
 directional_light directLight;
+frame_buffer frame;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
@@ -46,12 +48,17 @@ bool initialise() {
 
 bool load_content() {
 
+	frame = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
+
+	vector<vec3> positions{ vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f), vec3(-1.0f, 1.0f, 0.0f),
+		vec3(1.0f, 1.0f, 0.0f) };
+	vector<vec2> tex_coords{ vec2(0.0, 0.0), vec2(1.0f, 0.0f), vec2(0.0f, 1.0f), vec2(1.0f, 1.0f) };
+	screen_quad.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
+	screen_quad.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
+	screen_quad.set_type(GL_TRIANGLE_STRIP);
+
 	/***** Create All Meshes using meshes.cpp *****/
 	Meshes();
-
-	sphere = mesh(geometry_builder::create_sphere(100, 100));
-	sphere.get_transform().position = vec3(0.0f, 400.0f, 0.0f);
-	sphere.get_transform().scale = (vec3(50.0f));
 	/**********************************************/
 
 	/***** Terrain Generation *****/
@@ -123,6 +130,10 @@ bool load_content() {
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   eff.build();
 
+  simple_eff.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
+  simple_eff.add_shader("shaders/simple.frag", GL_FRAGMENT_SHADER);
+  simple_eff.build();
+
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
   sky_eff.add_shader("shaders/skybox.frag", GL_FRAGMENT_SHADER);
   sky_eff.add_shader("shaders/part_direction.frag", GL_FRAGMENT_SHADER);
@@ -135,6 +146,16 @@ bool load_content() {
   terrain_eff.add_shader("shaders/part_fog.frag", GL_FRAGMENT_SHADER);
   terrain_eff.add_shader("shaders/part_weighted_texture_4.frag", GL_FRAGMENT_SHADER);
   terrain_eff.build();
+
+  normals_eff.add_shader("shaders/debug_shaders.vert", GL_VERTEX_SHADER);
+  normals_eff.add_shader("shaders/debug_shaders.frag", GL_FRAGMENT_SHADER);
+  normals_eff.add_shader("shaders/normals.geom", GL_GEOMETRY_SHADER);
+  normals_eff.build();
+
+  billboard_eff.add_shader("shaders/billboarding.vert", GL_VERTEX_SHADER);
+  billboard_eff.add_shader("shaders/billboarding.frag", GL_FRAGMENT_SHADER);
+  billboard_eff.add_shader("shaders/billboard.geom", GL_GEOMETRY_SHADER);
+  billboard_eff.build();
   /****************************************************************/
 
   // ***** Set Free Camera (Default) Properties *****
@@ -393,10 +414,40 @@ texture BindingHelper(string name) {
 
 bool render() {
 
+	renderer::set_render_target(frame);
+	// Clear frame
+	renderer::clear();
+
 	/***** V & P can be used across multiple effects *****/
 	auto V = cameras[cameraType]->get_view();
 	auto P = cameras[cameraType]->get_projection();
 	/*****************************************************/
+
+	/***** Billboarding *****/
+	renderer::bind(billboard_eff);
+	auto MVP = P * V;
+	glUniformMatrix4fv(billboard_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(V));
+	glUniformMatrix4fv(billboard_eff.get_uniform_location("P"), 1, GL_FALSE, value_ptr(P));
+	glUniform1f(billboard_eff.get_uniform_location("point_size"), 2.0f);
+	/************************/
+
+	/***** Showing Normals *****/
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_CONTROL)) {
+		for (auto &e : meshes) {
+			auto m = e.second;
+			// Bind effect
+			renderer::bind(normals_eff);
+			// Create MVP matrix
+			auto M = m.get_transform().get_transform_matrix();
+			auto MVP = P * V * M;
+			// Set MVP matrix uniform
+			glUniformMatrix4fv(normals_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+
+			// Render mesh
+			renderer::render(m);
+		}
+	}
+	/*****************************************************************************************/
 
 	// ***** Skybox Stuff *****
 	glDisable(GL_DEPTH_TEST);
@@ -406,7 +457,7 @@ bool render() {
 	renderer::bind(sky_eff);
 	
 	auto M = skybox.get_transform().get_transform_matrix();
-	auto MVP = P * V * M;
+	MVP = P * V * M;
 	
 	glUniformMatrix4fv(sky_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 	auto MVS = V * M;
@@ -512,6 +563,16 @@ bool render() {
 		// Render geometry
 		renderer::render(m);
 	}
+
+	renderer::set_render_target();
+	renderer::bind(simple_eff);
+	MVP = mat4(1.0f);
+	glUniformMatrix4fv(simple_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+	renderer::bind(frame.get_frame(), 1);
+	glUniform1i(simple_eff.get_uniform_location("tex"), 1);
+
+	renderer::render(screen_quad);
+
 	return true;
 }
 
