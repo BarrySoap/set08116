@@ -131,7 +131,7 @@ bool load_content() {
   eff.build();
 
   simple_eff.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
-  simple_eff.add_shader("shaders/simple.frag", GL_FRAGMENT_SHADER);
+  simple_eff.add_shader("shaders/greyscale.frag", GL_FRAGMENT_SHADER);
   simple_eff.build();
 
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
@@ -414,9 +414,12 @@ texture BindingHelper(string name) {
 
 bool render() {
 
-	renderer::set_render_target(frame);
-	// Clear frame
-	renderer::clear();
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_ALT)) {
+		renderer::set_render_target(frame);
+		// Clear frame
+		renderer::clear();
+	}
+	
 
 	/***** V & P can be used across multiple effects *****/
 	auto V = cameras[cameraType]->get_view();
@@ -564,15 +567,17 @@ bool render() {
 		renderer::render(m);
 	}
 
-	renderer::set_render_target();
-	renderer::bind(simple_eff);
-	MVP = mat4(1.0f);
-	glUniformMatrix4fv(simple_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
-	renderer::bind(frame.get_frame(), 1);
-	glUniform1i(simple_eff.get_uniform_location("tex"), 1);
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_ALT)) {
+		renderer::set_render_target();
+		renderer::bind(simple_eff);
+		MVP = mat4(1.0f);
+		glUniformMatrix4fv(simple_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+		renderer::bind(frame.get_frame(), 1);
+		glUniform1i(simple_eff.get_uniform_location("tex"), 1);
 
-	renderer::render(screen_quad);
-
+		renderer::render(screen_quad);
+	}
+	
 	return true;
 }
 
