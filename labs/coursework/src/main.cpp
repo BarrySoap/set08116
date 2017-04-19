@@ -414,21 +414,23 @@ texture BindingHelper(string name) {
 
 bool render() {
 
+	/***** Frame Buffer Binding *****/
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_ALT)) {
 		renderer::set_render_target(frame);
 		// Clear frame
 		renderer::clear();
 	}
-	
+	/**********************************************************/
 
 	/***** V & P can be used across multiple effects *****/
 	auto V = cameras[cameraType]->get_view();
 	auto P = cameras[cameraType]->get_projection();
+	auto PV = P * V;
+	auto MVP = PV;
 	/*****************************************************/
 
 	/***** Billboarding *****/
 	renderer::bind(billboard_eff);
-	auto MVP = P * V;
 	glUniformMatrix4fv(billboard_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(V));
 	glUniformMatrix4fv(billboard_eff.get_uniform_location("P"), 1, GL_FALSE, value_ptr(P));
 	glUniform1f(billboard_eff.get_uniform_location("point_size"), 2.0f);
@@ -442,7 +444,7 @@ bool render() {
 			renderer::bind(normals_eff);
 			// Create MVP matrix
 			auto M = m.get_transform().get_transform_matrix();
-			auto MVP = P * V * M;
+			MVP = PV * M;
 			// Set MVP matrix uniform
 			glUniformMatrix4fv(normals_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 
@@ -460,7 +462,7 @@ bool render() {
 	renderer::bind(sky_eff);
 	
 	auto M = skybox.get_transform().get_transform_matrix();
-	MVP = P * V * M;
+	MVP = PV * M;
 	
 	glUniformMatrix4fv(sky_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 	auto MVS = V * M;
@@ -487,12 +489,12 @@ bool render() {
 
 	/***** Terrain Stuff *****/
 	renderer::bind(terrain_eff);
-	auto MT = terr.get_transform().get_transform_matrix();
-	auto MVPT = P * V * MT;
-	glUniformMatrix4fv(terrain_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVPT));
-	auto MVT = V * MT;
+	M = terr.get_transform().get_transform_matrix();
+	MVP = PV * M;
+	glUniformMatrix4fv(terrain_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+	auto MVT = V * M;
 	glUniformMatrix4fv(terrain_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(MVT));
-	glUniformMatrix4fv(terrain_eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(MT));
+	glUniformMatrix4fv(terrain_eff.get_uniform_location("M"), 1, GL_FALSE, value_ptr(M));
 	glUniformMatrix3fv(terrain_eff.get_uniform_location("N"), 1, GL_FALSE, value_ptr(terr.get_transform().get_normal_matrix()));
 	glUniform3fv(terrain_eff.get_uniform_location("eye_pos"), 1, value_ptr(cameras[cameraType]->get_position()));
 	glUniform4fv(terrain_eff.get_uniform_location("fog_colour"), 1, value_ptr(vec4(0.5f, 0.5f, 0.5f, 1.0f)));
@@ -534,7 +536,7 @@ bool render() {
 		else {
 			M = m.get_transform().get_transform_matrix();
 		}
-		auto MVP = P * V * M;
+		MVP = PV * M;
 		// Set MVP matrix uniform
 		glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
 		auto MV = V * M;
