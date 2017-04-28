@@ -14,7 +14,7 @@ map<mesh*, mesh*> transformed_hierarchy;
 mesh skybox, terr;
 geometry geom;
 geometry screen_quad;
-effect eff, simple_eff, sky_eff, terrain_eff, normals_eff, billboard_eff;
+effect eff, greyscale_eff, sky_eff, terrain_eff, normals_eff, motion_blur, blur_eff;
 map<string, texture> texs;
 texture terrainTexs[4];
 array<camera*, 2> cameras;
@@ -26,10 +26,13 @@ cubemap cube_map;
 spot_light spotLight;
 vector<point_light> pointLights(7);
 directional_light directLight;
-frame_buffer frame;
+frame_buffer frames[2];
+frame_buffer greyscale_frame;
+frame_buffer temp_frame;
 double cursor_x = 0.0;
 double cursor_y = 0.0;
 float temp = 0;
+unsigned int current_frame = 0;
 int fog = 2;
 
 bool initialise() {
@@ -48,7 +51,13 @@ bool initialise() {
 
 bool load_content() {
 
-	frame = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
+	/***** Create Frame Buffers/Screen Quad *****/
+	frames[0] = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
+	frames[1] = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
+	greyscale_frame = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
+
+	// Create a temp framebuffer
+	temp_frame = frame_buffer(renderer::get_screen_width(), renderer::get_screen_height());
 
 	vector<vec3> positions{ vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f), vec3(-1.0f, 1.0f, 0.0f),
 		vec3(1.0f, 1.0f, 0.0f) };
@@ -56,6 +65,7 @@ bool load_content() {
 	screen_quad.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
 	screen_quad.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 	screen_quad.set_type(GL_TRIANGLE_STRIP);
+	/***************************************************************************************************/
 
 	/***** Create All Meshes using meshes.cpp *****/
 	Meshes();
@@ -130,9 +140,9 @@ bool load_content() {
   eff.add_shader(frag_shaders, GL_FRAGMENT_SHADER);
   eff.build();
 
-  simple_eff.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
-  simple_eff.add_shader("shaders/greyscale.frag", GL_FRAGMENT_SHADER);
-  simple_eff.build();
+  greyscale_eff.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
+  greyscale_eff.add_shader("shaders/greyscale.frag", GL_FRAGMENT_SHADER);
+  greyscale_eff.build();
 
   sky_eff.add_shader("shaders/skybox.vert", GL_VERTEX_SHADER);
   sky_eff.add_shader("shaders/skybox.frag", GL_FRAGMENT_SHADER);
@@ -152,10 +162,13 @@ bool load_content() {
   normals_eff.add_shader("shaders/normals.geom", GL_GEOMETRY_SHADER);
   normals_eff.build();
 
-  billboard_eff.add_shader("shaders/billboarding.vert", GL_VERTEX_SHADER);
-  billboard_eff.add_shader("shaders/billboarding.frag", GL_FRAGMENT_SHADER);
-  billboard_eff.add_shader("shaders/billboard.geom", GL_GEOMETRY_SHADER);
-  billboard_eff.build();
+  motion_blur.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
+  motion_blur.add_shader("shaders/motion_blur.frag", GL_FRAGMENT_SHADER);
+  motion_blur.build();
+
+  blur_eff.add_shader("shaders/simple.vert", GL_VERTEX_SHADER);
+  blur_eff.add_shader("shaders/blur.frag", GL_FRAGMENT_SHADER);
+  blur_eff.build();
   /****************************************************************/
 
   // ***** Set Free Camera (Default) Properties *****
@@ -170,6 +183,8 @@ bool load_content() {
 
 
 bool update(float delta_time) {
+
+	current_frame = (current_frame + 1) % 2;
 
 	/***** Fog Control *****/
 	if (glfwGetKey(renderer::get_window(), '5')) {
@@ -196,7 +211,7 @@ bool update(float delta_time) {
 	/******************************************************************************************************************/
 
 	/***** FPS *****/
-	//cout << 1.0f / delta_time << endl;
+	cout << 1.0f / delta_time << endl;
 	/********************************/
 
 	// ***** Rotate the torus' along the y axis *****
@@ -416,7 +431,15 @@ bool render() {
 
 	/***** Frame Buffer Binding *****/
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_ALT)) {
-		renderer::set_render_target(frame);
+		renderer::set_render_target(temp_frame);
+		// Clear frame
+		renderer::clear();
+	}
+	/**********************************************************/
+
+	/***** Greyscale *****/
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT_CONTROL) || glfwGetKey(renderer::get_window(), GLFW_KEY_0)) {
+		renderer::set_render_target(greyscale_frame);
 		// Clear frame
 		renderer::clear();
 	}
@@ -428,13 +451,6 @@ bool render() {
 	auto PV = P * V;
 	auto MVP = PV;
 	/*****************************************************/
-
-	/***** Billboarding *****/
-	renderer::bind(billboard_eff);
-	glUniformMatrix4fv(billboard_eff.get_uniform_location("MV"), 1, GL_FALSE, value_ptr(V));
-	glUniformMatrix4fv(billboard_eff.get_uniform_location("P"), 1, GL_FALSE, value_ptr(P));
-	glUniform1f(billboard_eff.get_uniform_location("point_size"), 2.0f);
-	/************************/
 
 	/***** Showing Normals *****/
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_CONTROL)) {
@@ -570,12 +586,44 @@ bool render() {
 	}
 
 	if (glfwGetKey(renderer::get_window(), GLFW_KEY_LEFT_ALT)) {
-		renderer::set_render_target();
-		renderer::bind(simple_eff);
+		renderer::set_render_target(frames[current_frame]);
+		renderer::clear();
+		renderer::bind(motion_blur);
 		MVP = mat4(1.0f);
-		glUniformMatrix4fv(simple_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
-		renderer::bind(frame.get_frame(), 1);
-		glUniform1i(simple_eff.get_uniform_location("tex"), 1);
+		glUniformMatrix4fv(motion_blur.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+		renderer::bind(temp_frame.get_frame(), 0);
+		renderer::bind(frames[(current_frame + 1) % 2].get_frame(), 1);
+		glUniform1i(motion_blur.get_uniform_location("tex"), 0);
+		glUniform1i(motion_blur.get_uniform_location("previous_frame"), 1);
+		glUniform1f(motion_blur.get_uniform_location("blend_factor"), 0.9f);
+
+		renderer::render(screen_quad);
+
+		renderer::set_render_target();
+		renderer::bind(frames[current_frame].get_frame(), 3);
+		renderer::render(screen_quad);
+	}
+
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_RIGHT_CONTROL)) {
+		renderer::set_render_target();
+		renderer::bind(greyscale_eff);
+		MVP = mat4(1.0f);
+		glUniformMatrix4fv(greyscale_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+		renderer::bind(greyscale_frame.get_frame(), 1);
+		glUniform1i(greyscale_eff.get_uniform_location("tex"), 1);
+
+		renderer::render(screen_quad);
+	}
+
+	if (glfwGetKey(renderer::get_window(), GLFW_KEY_0)) {
+		renderer::set_render_target();
+		renderer::bind(blur_eff);
+		MVP = mat4(1.0f);
+		glUniformMatrix4fv(blur_eff.get_uniform_location("MVP"), 1, GL_FALSE, value_ptr(MVP));
+		renderer::bind(greyscale_frame.get_frame(), 1);
+		glUniform1i(blur_eff.get_uniform_location("tex"), 1);
+		glUniform1f(blur_eff.get_uniform_location("inverse_width"), 5.0f / renderer::get_screen_width());
+		glUniform1f(blur_eff.get_uniform_location("inverse_height"), 5.0f / renderer::get_screen_height());
 
 		renderer::render(screen_quad);
 	}
